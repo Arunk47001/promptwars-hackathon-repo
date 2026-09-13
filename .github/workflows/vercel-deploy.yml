@@ -1,0 +1,51 @@
+name: Vercel Deploy (D6)
+
+# Prepared by the deploy lane (D6) as the CI/CD wiring mechanism, because
+# this Vercel account does not yet have a GitHub "login connection" set up
+# (Vercel's native git integration needs that OAuth link, which an agent
+# cannot complete interactively — see docs/deploy-manual-steps.md). This
+# workflow is an equivalent path using the Vercel CLI directly:
+#   - pull_request -> preview deployment, URL posted in the job log
+#   - push to main -> production deployment
+#
+# Requires one repo secret, added by a human in GitHub's UI (Settings ->
+# Secrets and variables -> Actions -> "New repository secret"):
+#   VERCEL_TOKEN   Personal token from https://vercel.com/account/tokens
+#
+# Org/project IDs below are NOT secret (Vercel's own docs treat them as
+# plain identifiers) — they came from this repo's .vercel/project.json,
+# created by `vercel link` during the D5 deploy pass.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  VERCEL_ORG_ID: team_yGjpw3cWVySIl5Ig9StwfGHe
+  VERCEL_PROJECT_ID: prj_hVT03ufDTl5NilJPTitql9lzQ1ws
+
+jobs:
+  deploy-preview:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npx vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - run: npx vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - run: npx vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+
+  deploy-production:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      - run: npx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - run: npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

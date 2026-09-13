@@ -1,0 +1,23 @@
+# Local dev database only. The Next.js app itself runs via `vercel dev` /
+# `npm run dev`, not inside this compose file (see README "Local development").
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: brics-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: brics
+      POSTGRES_PASSWORD: brics_dev_password
+      POSTGRES_DB: brics_citizen_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - brics_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U brics -d brics_citizen_platform"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  brics_pg_data:
