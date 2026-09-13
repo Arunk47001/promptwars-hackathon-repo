@@ -2,6 +2,7 @@ import { query } from "@/lib/db";
 import { anonymizeSubmission } from "@/lib/anonymize";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/debug/anonymization-sample (C8 + C13's before/after toggle).
