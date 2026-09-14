@@ -28,8 +28,13 @@ const BIHAR_CENTER: [number, number] = [25.9, 85.6];
  */
 function colorForScore(score: number | undefined, max: number, min: number): string {
   if (score === undefined) return "#e0e0e0";
-  const range = max - min || 1;
-  const t = Math.max(0, Math.min(1, (score - min) / range));
+  // When every scored district ties (no variance - e.g. only 1-2 distinct
+  // district+category groups exist yet), there's no real "low" vs "high"
+  // end of the range, so don't collapse everything to t=0 (which renders
+  // as near-invisible on this light-to-dark scale) - use a visible mid
+  // tone instead, so tied hotspots still stand out on the map.
+  const range = max - min;
+  const t = range === 0 ? 0.5 : Math.max(0, Math.min(1, (score - min) / range));
   // Light blue (#eff6ff) -> dark blue (#1e3a8a), interpolated per channel.
   const light = { r: 0xef, g: 0xf6, b: 0xff };
   const dark = { r: 0x1e, g: 0x3a, b: 0x8a };
@@ -41,8 +46,8 @@ function colorForScore(score: number | undefined, max: number, min: number): str
 
 function severityLabel(score: number | undefined, max: number, min: number): string {
   if (score === undefined) return "no data";
-  const range = max - min || 1;
-  const t = Math.max(0, Math.min(1, (score - min) / range));
+  const range = max - min;
+  const t = range === 0 ? 0.5 : Math.max(0, Math.min(1, (score - min) / range));
   if (t >= 2 / 3) return "high severity";
   if (t >= 1 / 3) return "medium severity";
   return "low severity";
