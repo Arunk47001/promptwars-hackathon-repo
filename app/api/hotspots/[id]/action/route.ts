@@ -2,10 +2,29 @@ import {
   markHotspotActioned,
   triggerReengagement,
   recomputePostActionScore,
-  getImpactComparison
+  getImpactComparison,
+  getImpactComparisonByHotspotId
 } from "@/lib/impact";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+/**
+ * GET /api/hotspots/:id/action - fetches the persisted impact comparison
+ * for an already-actioned hotspot, if one exists. Unlike POST, this never
+ * triggers re-engagement or recomputes anything - it's a pure read, safe
+ * to call every time the detail panel opens so the before/after view (and
+ * the "view impact over time" link, once that fuller screen exists)
+ * survives closing/reopening the panel rather than only appearing in the
+ * one-shot response right after the action button is clicked.
+ */
+export async function GET(_request: Request, { params }: { params: { id: string } }) {
+  const comparison = await getImpactComparisonByHotspotId(params.id);
+  if (!comparison) {
+    return Response.json({ comparison: null }, { status: 404 });
+  }
+  return Response.json({ comparison });
+}
 
 /**
  * POST /api/hotspots/:id/action - impact-tracking "mark as funded/actioned"

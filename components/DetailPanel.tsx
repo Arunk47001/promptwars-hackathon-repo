@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { CleanSubmissionRow, HotspotRow, ImpactComparison } from "@/app/dashboard/types";
+import SeverityBadge from "./SeverityBadge";
 
 interface Props {
   hotspot: HotspotRow;
@@ -22,7 +23,23 @@ export default function DetailPanel({ hotspot, onActioned }: Props) {
     fetch(`/api/hotspots/${hotspot.id}`)
       .then((res) => res.json())
       .then((data) => setSubmissions(data.submissions ?? []));
-  }, [hotspot.id]);
+
+    // Show the persisted before/after comparison on every open, not just
+    // right after clicking "mark as actioned" - closes the design gap
+    // flagged in .squad/designer/: the panel previously only showed impact
+    // info transiently in the same session it was actioned.
+    if (hotspot.is_actioned) {
+      fetch(`/api/hotspots/${hotspot.id}/action`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.comparison) setComparison(data.comparison);
+        })
+        .catch(() => {
+          // Non-fatal: the panel still works without the persisted
+          // comparison, it just won't show the impact summary.
+        });
+    }
+  }, [hotspot.id, hotspot.is_actioned]);
 
   async function loadRationale() {
     setRationaleLoading(true);
@@ -60,7 +77,8 @@ export default function DetailPanel({ hotspot, onActioned }: Props) {
         {hotspot.district} — {hotspot.category}
       </h3>
       <p>
-        Composite score: <strong>{hotspot.composite_score.toFixed(2)}</strong> (demand{" "}
+        Composite score: <strong>{hotspot.composite_score.toFixed(2)}</strong>{" "}
+        <SeverityBadge score={hotspot.composite_score} /> (demand{" "}
         {hotspot.demand_volume.toFixed(2)}, infra-gap {hotspot.infra_gap_score.toFixed(2)},
         investment offset {hotspot.investment_offset.toFixed(2)})
       </p>
@@ -93,6 +111,13 @@ export default function DetailPanel({ hotspot, onActioned }: Props) {
               <strong>{comparison.postActionScore?.toFixed(2) ?? "n/a"}</strong>
             </p>
             <p>Re-engagement sent to {comparison.reengagementRecipientCount} citizen(s).</p>
+            <p style={{ fontSize: 13, color: "#555" }}>
+              This is the impact summary for this single action. A full
+              impact-over-time trend view across all actioned hotspots is
+              designed but not yet built — see
+              .squad/designer/brics-citizen-infrastructure-platform.md
+              (screen 7, &ldquo;Impact tracking&rdquo;).
+            </p>
           </div>
         )}
       </div>

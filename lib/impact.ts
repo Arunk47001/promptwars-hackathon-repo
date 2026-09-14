@@ -173,6 +173,28 @@ export interface ImpactComparison {
   reengagementRecipientCount: number;
 }
 
+/**
+ * Looks up the impact comparison for a hotspot by the hotspot_scores row
+ * id itself (rather than the impact_actions id), so the dashboard can
+ * show "before/after" for an already-actioned hotspot on every panel
+ * open - not only in the transient response right after the action
+ * button is clicked. Uses the most recent action if a hotspot was ever
+ * actioned more than once.
+ */
+export async function getImpactComparisonByHotspotId(
+  hotspotScoreId: string
+): Promise<ImpactComparison | null> {
+  const result = await query<{ id: string }>(
+    `SELECT id FROM impact_actions
+     WHERE pre_action_hotspot_score_id = $1
+     ORDER BY actioned_at DESC LIMIT 1`,
+    [hotspotScoreId]
+  );
+  const impactActionId = result.rows[0]?.id;
+  if (!impactActionId) return null;
+  return getImpactComparison(impactActionId);
+}
+
 export async function getImpactComparison(
   impactActionId: string
 ): Promise<ImpactComparison | null> {

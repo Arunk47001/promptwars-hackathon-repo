@@ -75,7 +75,7 @@ export default function HotspotTable({ hotspots, selectedId, onSelect }: Props) 
               <td>{h.investment_offset.toFixed(2)}</td>
               <td>{h.submission_count}</td>
               <td>{h.duplicate_count}</td>
-              <td>{h.is_actioned ? "✅" : ""}</td>
+              <td>{h.is_actioned ? "✅ Actioned" : "—"}</td>
             </tr>
           ))}
         </tbody>
