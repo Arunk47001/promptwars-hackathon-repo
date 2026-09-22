@@ -1,7 +1,7 @@
 /**
  * C4 ingestion script: NFHS-5 (National Family Health Survey, 2019-21)
  * district factsheet infrastructure-access indicators, filtered to the
- * demo state (Bihar).
+ * demo state (Karnataka).
  *
  * Source (see docs/dataset-provenance.md): pratapvardhan/NFHS-5 on GitHub,
  * a long-format CSV compilation of the official NFHS-5 district factsheets

@@ -27,7 +27,7 @@ import type { ExtractedRecord } from "@/lib/gemini";
  */
 
 const TEST_PHONE = "+919999900001";
-const TEST_DISTRICT = "Patna";
+const TEST_DISTRICT = "Mysore";
 const TEST_CATEGORY = "water";
 
 let skip = false;
@@ -64,10 +64,10 @@ afterAll(async () => {
 
 const fakeExtract = async (): Promise<ExtractedRecord> => ({
   category: TEST_CATEGORY,
-  state: "Bihar",
+  state: "Karnataka",
   district: TEST_DISTRICT,
-  block: "Barh",
-  village: "Barhara Kothi",
+  block: "Nanjangud",
+  village: "Hullahalli",
   description: "The hand pump has been broken for two weeks, no clean water.",
   urgency: "high",
   sentiment: "negative",
@@ -90,7 +90,7 @@ describe("webhook -> queue -> processed-record integration", () => {
       phoneNumber: uniquePhone,
       rawPayload: { From: uniquePhone, Body: "test" },
       rawText:
-        "My name is Test Citizen. The hand pump has been broken for two weeks in Patna."
+        "My name is Test Citizen. The hand pump has been broken for two weeks in Mysore."
     });
 
     expect(intakeResult.rateLimited).toBe(false);

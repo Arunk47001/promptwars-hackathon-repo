@@ -1,25 +1,20 @@
+import { severityLabel, SEVERITY_BADGE_COLORS } from "@/lib/colorScale";
+
+export { severityLabel };
+
 /**
  * Text+color severity badge (see .squad/designer/…: "SeverityBadge —
  * Text+color badge — never color-only"). The composite score is a
  * z-score-based composite, so it can be negative; bucket it into
  * Low/Medium/High around 0 using a +/-1 threshold rather than encoding
- * severity as a raw number or color alone.
+ * severity as a raw number or color alone. The bucketing/color logic now
+ * lives in lib/colorScale.ts so the redesigned dashboard's other badges
+ * (top-hotspots list, ranked table, hotspot drawer) share the same
+ * definition instead of re-deriving it.
  */
-export function severityLabel(score: number): "Low" | "Medium" | "High" {
-  if (score >= 1) return "High";
-  if (score <= -1) return "Low";
-  return "Medium";
-}
-
-const SEVERITY_COLORS: Record<string, { bg: string; fg: string }> = {
-  High: { bg: "#fee2e2", fg: "#991b1b" },
-  Medium: { bg: "#fef3c7", fg: "#92400e" },
-  Low: { bg: "#dcfce7", fg: "#166534" }
-};
-
 export default function SeverityBadge({ score }: { score: number }) {
   const label = severityLabel(score);
-  const { bg, fg } = SEVERITY_COLORS[label];
+  const { bg, fg } = SEVERITY_BADGE_COLORS[label];
   return (
     <span
       style={{

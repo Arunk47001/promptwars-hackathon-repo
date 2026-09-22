@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f6f5f2; color: #1a1c1e; font-family: 'IBM Plex Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: #1e5aa8; text-decoration: none; }
+  a:hover { color: #164374; text-decoration: underline; }
+  ::selection { background: #d9e6f4; }
+  @keyframes cipfade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @keyframes cipslide { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes cippulse { 0%,100% { opacity: .35; } 50% { opacity: .9; } }
+</style>
+</helmet>
+<div style="display: grid; grid-template-columns: 220px minmax(0, 1fr); min-height: 100vh; background: #f6f5f2;">
+
+  <aside style="background: #1c2024; color: #b9bec4; display: flex; flex-direction: column; padding: 0 0 16px; position: sticky; top: 0; height: 100vh;">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 18px 18px 22px;">
+      <div style="width: 26px; height: 26px; border-radius: 3px; background: #1e5aa8; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; letter-spacing: .04em;">CI</div>
+      <div style="line-height: 1.15;">
+        <div style="color: #fff; font-size: 12.5px; font-weight: 600;">Citizen Infrastructure</div>
+        <div style="font-size: 10.5px; color: #7d848b; letter-spacing: .06em; text-transform: uppercase;">BRICS Platform</div>
+      </div>
+    </div>
+
+    <div style="padding: 0 10px; display: flex; flex-direction: column; gap: 2px;">
+      <div style="font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #6b7278; padding: 6px 8px 8px;">Analysis</div>
+      <sc-for list="{{ nav }}" as="item" hint-placeholder-count="4">
+        <button type="button" onClick="{{ item.go }}" style="{{ item.style }}" style-hover="background: #262b30; color: #ffffff;">
+          <span style="width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .55; flex: none;"></span>
+          <span>{{ item.label }}</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="padding: 0 10px; display: flex; flex-direction: column; gap: 2px; margin-top: 14px;">
+      <div style="font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #6b7278; padding: 6px 8px 8px;">Administration</div>
+      <sc-for list="{{ adminNav }}" as="item" hint-placeholder-count="3">
+        <div style="{{ item.style }}">
+          <span style="width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .4; flex: none;"></span>
+          <span>{{ item.label }}</span>
+          <span style="margin-left: auto; font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; color: #5d646b;">{{ item.tag }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top: auto; padding: 14px 18px 0; border-top: 1px solid #2a2f34; margin-left: 10px; margin-right: 10px;">
+      <div style="font-size: 11px; color: #7d848b; line-height: 1.5;">Signed in as<br /><span style="color: #dfe3e7;">A. Raghunathan</span></div>
+      <div style="font-size: 10.5px; color: #6b7278; margin-top: 4px;">{{ roleLabel }}</div>
+    </div>
+  </aside>
+
+  <div style="display: flex; flex-direction: column; min-width: 0;">
+    <header style="display: flex; align-items: center; gap: 10px; padding: 0 22px; height: 52px; background: #fff; border-bottom: 1px solid #e2e0da; position: sticky; top: 0; z-index: 30;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <div style="display: flex; align-items: center; gap: 7px; border: 1px solid #ddd9d1; border-radius: 4px; padding: 5px 10px; font-size: 12.5px; font-weight: 500; background: #fbfaf8;" style-hover="border-color: #1e5aa8;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6d7076; letter-spacing: .06em;">IND</span>
+          <span>India</span>
+          <span style="color: #9b9ea3; font-size: 10px;">▾</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 7px; border: 1px solid #ddd9d1; border-radius: 4px; padding: 5px 10px; font-size: 12.5px; font-weight: 500; background: #fbfaf8;" style-hover="border-color: #1e5aa8;">
+          <span>Bihar</span>
+          <span style="color: #9b9ea3; font-size: 10px;">▾</span>
+          <span style="font-size: 10.5px; color: #6d7076;">28 districts</span>
+        </div>
+      </div>
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+        <div style="font-size: 11.5px; color: #6d7076; font-family: 'IBM Plex Mono', monospace;">Last ingest 12 Sep 04:10 IST</div>
+        <div style="width: 1px; height: 20px; background: #e2e0da;"></div>
+        <button type="button" onClick="{{ toggleAlerts }}" style="display: flex; align-items: center; gap: 7px; border: 1px solid #ddd9d1; background: #fff; border-radius: 4px; padding: 5px 10px; font-size: 12px; font-family: inherit; color: #1a1c1e; cursor: pointer;" style-hover="border-color: #1e5aa8;">
+          <span>Alerts</span>
+          <span style="background: #a62b1f; color: #fff; border-radius: 8px; padding: 1px 6px; font-size: 10.5px; font-weight: 600; font-family: 'IBM Plex Mono', monospace;">3</span>
+        </button>
+        <div style="border: 1px solid #ddd9d1; background: #fff; border-radius: 4px; padding: 5px 9px; font-size: 12px; color: #1a1c1e;">EN ▾</div>
+        <div style="width: 26px; height: 26px; border-radius: 50%; background: #e3eaf3; color: #1e5aa8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">AR</div>
+      </div>
+    </header>
+
+    <sc-if value="{{ alertsOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position: fixed; top: 54px; right: 22px; width: 340px; background: #fff; border: 1px solid #d9d5cc; border-radius: 6px; box-shadow: 0 12px 30px rgba(20, 22, 24, .14); z-index: 40; overflow: hidden;">
+        <div style="padding: 10px 14px; border-bottom: 1px solid #ece9e3; font-size: 12px; font-weight: 600; display: flex; align-items: center;">
+          <span>Notifications</span>
+          <button type="button" onClick="{{ toggleAlerts }}" style="margin-left: auto; border: 0; background: none; font-family: inherit; font-size: 12px; color: #6d7076; cursor: pointer;">Close</button>
+        </div>
+        <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="3">
+          <div style="padding: 11px 14px; border-bottom: 1px solid #f2efe9; display: flex; gap: 10px;" style-hover="background: #fbfaf8;">
+            <span style="{{ a.dot }}"></span>
+            <div style="min-width: 0;">
+              <div style="font-size: 12.5px; line-height: 1.4;">{{ a.text }}</div>
+              <div style="font-size: 11px; color: #6d7076; margin-top: 3px; font-family: 'IBM Plex Mono', monospace;">{{ a.when }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <main style="padding: 22px 24px 56px; min-width: 0; animation: cipfade .25s ease both;">
+
+      <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div style="display: flex; align-items: flex-end; gap: 16px; margin-bottom: 18px;">
+            <div>
+              <h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -.015em;">Dashboard overview</h1>
+              <div style="font-size: 13px; color: #6d7076; margin-top: 5px;">India / Bihar · citizen demand fused with demographic, infrastructure and investment data</div>
+            </div>
+            <div style="margin-left: auto; display: flex; gap: 8px;">
+              <div style="border: 1px solid #ddd9d1; background: #fff; border-radius: 4px; padding: 7px 11px; font-size: 12.5px;">Last 90 days ▾</div>
+              <button type="button" onClick="{{ goHotspots }}" style="border: 1px solid #1e5aa8; background: #1e5aa8; color: #fff; border-radius: 4px; padding: 7px 13px; font-size: 12.5px; font-weight: 500; font-family: inherit; cursor: pointer;" style-hover="background: #164374;">View all hotspots</button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;">
+            <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+              <button type="button" onClick="{{ k.go }}" style="text-align: left; background: #fff; border: 1px solid #e2e0da; border-radius: 6px; padding: 14px 15px 15px; cursor: pointer; font-family: inherit; display: block;" style-hover="border-color: #1e5aa8; box-shadow: 0 2px 8px rgba(20, 22, 24, .06);">
+                <div style="font-size: 11.5px; color: #6d7076; letter-spacing: .01em; min-height: 32px;">{{ k.label }}</div>
+                <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 8px;">
+                  <span style="font-size: 32px; font-weight: 600; font-family: 'IBM Plex Mono', monospace; letter-spacing: -.02em;">{{ k.value }}</span>
+                  <span style="{{ k.trendStyle }}">{{ k.trend }}</span>
+                </div>
+                <div style="font-size: 11px; color: #8a8d92; margin-top: 6px;">{{ k.sub }}</div>
+              </button>
+            </sc-for>
+          </div>
+
+          <div style="display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 12px; margin-top: 12px; align-items: start;">
+            <section style="background: #fff; border: 1px solid #e2e0da; border-radius: 6px; padding: 14px 15px 16px;">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                <h2 style="margin: 0; font-size: 16px; font-weight: 600;">Composite demand score by district</h2>
+                <div style="margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: #6d7076;">
+                  <span>low</span>
+                  <sc-for list="{{ legend }}" as="l" hint-placeholder-count="6">
+                    <span style="{{ l.style }}"></span>
+                  </sc-for>
+                  <span>high</span>
+                </div>
+              </div>
+              <div style="font-size: 11.5px; color: #8a8d92; margin-bottom: 12px;">District grid — one cell per district, arranged west to east. Equivalent data is in the ranked table on Hotspots.</div>
+              <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px;">
+                <sc-for list="{{ cells }}" as="c" hint-placeholder-count="28">
+                  <button type="button" onClick="{{ c.go }}" aria-label="{{ c.aria }}" style="{{ c.style }}" style-hover="outline: 2px solid #1a1c1e; outline-offset: -2px;">
+                    <span style="font-size: 9.5px; line-height: 1.15; font-weight: 500; letter-spacing: -.01em;">{{ c.short }}</span>
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;">{{ c.score }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </section>
+
+            <section style="background: #fff; border: 1px solid #e2e0da; border-radius: 6px; padding: 14px 15px 8px;">
+              <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <h2 style="margin: 0; font-size: 16px; font-weight: 600;">Top hotspots</h2>
+                <a href="#hotspots" onClick="{{ goHotspots }}" style="margin-left: auto; font-size: 12px;">View all 142</a>
+              </div>
+              <sc-for list="{{ topFive }}" as="h" hint-placeholder-count="5">
+                <button type="button" onClick="{{ h.open }}" style="width: 100%; text-align: left; display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 4px; border: 0; border-top: 1px solid #f0ede7; background: none; font-family: inherit; cursor: pointer;" style-hover="background: #fbfaf8;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #9b9ea3;">{{ h.rank }}</span>
+                  <span style="min-width: 0;">
+                    <span style="display: block; font-size: 13px; font-weight: 500;">{{ h.district }}</span>
+                    <span style="display: block; font-size: 11.5px; color: #6d7076; margin-top: 2px;">{{ h.category }} · {{ h.requests }} requests</span>
+                  </span>
+                  <span style="display: flex; align-items: center; gap: 8px;">
+                    <span style="{{ h.badgeStyle }}">{{ h.severity }}</span>
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 500;">{{ h.score }}</span>
+                  </span>
+                </button>
+              </sc-for>
+            </section>
+          </div>
+
+          <section style="background: #fff; border: 1px solid #e2e0da; border-radius: 6px; padding: 14px 15px 6px; margin-top: 12px;">
+            <h2 style="margin: 0 0 4px; font-size: 16px; font-weight: 600;">Recent activity</h2>
+            <div style="font-size: 11.5px; color: #8a8d92; margin-bottom: 8px;">Hotspot emergence, actions taken and data-source events</div>
+            <sc-for list="{{ activity }}" as="a" hint-placeholder-count="4">
+              <div style="display: grid; grid-template-columns: 96px 1fr auto; gap: 14px; align-items: baseline; padding: 9px 2px; border-top: 1px solid #f0ede7;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #8a8d92;">{{ a.when }}</span>
+                <span style="font-size: 12.5px; line-height: 1.45;">{{ a.text }}</span>
+                <span style="{{ a.tagStyle }}">{{ a.tag }}</span>
+              </div>
+            </sc-for>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isHotspots }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="display: flex; align-items: flex-end; gap: 16px; margin-bottom: 14px;">
+            <div>
+              <h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -.015em;">Hotspot explorer</h1>
+              <div style="font-size: 13px; color: #6d7076; margin-top: 5px;">Ranked, explainable demand hotspots. Select a district or a row to open its evidence trail.</div>
+            </div>
+            <div style="margin-left: auto; display: flex; gap: 8px;">
+              <button type="button" onClick="{{ recompute }}" style="border: 1px solid #ddd9d1; background: #fff; border-radius: 4px; padding: 7px 12px; font-size: 12.5px; font-family: inherit; cursor: pointer; color: #1a1c1e;" style-hover="border-color: #1e5aa8;">{{ recomputeLabel }}</button>
+              <button type="button" onClick="{{ openExport }}" style="border: 1px solid #1e5aa8; background: #1e5aa8; color: #fff; border-radius: 4px; padding: 7px 13px; font-size: 12.5px; font-weight: 500; font-family: inherit; cursor: pointer;" style-hover="background: #164374;">Export report</button>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: #fff; border: 1px solid #e2e0da; border-radius: 6px; padding: 9px 11px; margin-bottom: 12px;">
+            <span style="font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #8a8d92; margin-right: 2px;">Category</span>
+            <sc-for list="{{ categoryChips }}" as="c" hint-placeholder-count="7">
+              <button type="button" onClick="{{ c.go }}" style="{{ c.style }}" style-hover="border-color: #1e5aa8;">{{ c.label }}</button>
+            </sc-for>
+            <div style="width: 1px; height: 22px; background: #e8e5de; margin: 0 4px;"></div>
+            <div style="border: 1px solid #ddd9d1; border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #1a1c1e; background: #fbfaf8;">Urgency: any ▾</div>
+            <div style="border: 1px solid #ddd9d1; border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #1a1c1e; background: #fbfaf8;">1 Jun – 12 Sep 2026 ▾</div>
+            <input type="text" value="{{ query }}" onChange="{{ setQuery }}" placeholder="Search district" style="border: 1px solid #ddd9d1; border-radius: 4px; padding: 6px 10px; font-size: 12px; font-family: inherit; width: 150px; background: #fff; color: #1a1c1e;" />
+            <div style="margin-left: auto; font-size: 12px; color: #6d7076; font-family: 'IBM Plex Mono', monospace;">{{ resultCount }}</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(540px, 1fr)); gap: 12px; align-items: start;">
+            <section style="background: #fff; border: 1px solid #e2e0da; border-radius: 6px; padding: 13px 14px 15px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                <h2 style="margin: 0; font-size: 14px; font-weight: 600;">District grid</h2>
+                <div style="margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: #6d7076;">
+                  <span>0.4</span>
+                  <sc-for list="{{ legend }}" as="l" hint-placeholder-count="6">
+                    <span style="{{ l.style }}"></span>
+                  </sc-for>
+                  <span>2.5</span>
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px;">
+                <sc-for list="{{ cells }}" as="c" hint-placeholder-count="28">
+                  <button type="button" onClick="{{ c.go }}" aria-label="{{ c.aria }}" style="{{ c.styleLg }}" style-hover="outline: 2px solid #1a1c1e; outline-offset: -2px;">
+                    <span style="font-size: 10px; line-height: 1.15; font-weight: 500;">{{ c.short }}</span>
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500;">{{ c.score }}</span>
+                  </button>
+                </sc-for>
+              </div>
+              <div style="font-size: 11px; color: #8a8d92; margin-top: 10px; line-height: 1.5;">Sequential single-hue scale. Every value shown here is also in the ranked table, which is the equal-access alternative to the map.</div>
+            </section>
+
+            <section style="background: #fff; border: 1px solid #e2e0da; border-radius: 6px; overflow: hidden;">
+              <div style="display: grid; grid-template-columns: 30px minmax(120px, 1.5fr) 76px 52px 52px 52px 52px 76px; gap: 6px; padding: 9px 12px; min-width: 560px; background: #fbfaf8; border-bottom: 1px solid #e8e5de; font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; color: #6d7076;">
+                <span>#</span>
+                <button type="button" onClick="{{ sortDistrict }}" style="text-align: left; border: 0; background: none; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer; padding: 0;">District</button>
+                <span>Category</span>
+                <button type="button" onClick="{{ sortScore }}" style="text-align: right; border: 0; background: none; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer; padding: 0;">{{ scoreHeader }}</button>
+                <span style="text-align: right;">Demand</span>
+                <span style="text-align: right;">Gap</span>
+                <span style="text-align: right;">Offset</span>
+                <span>Status</span>
+              </div>
+              <div style="max-height: 486px; overflow-y: auto; overflow-x: auto;">
+                <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12">
+                  <div onClick="{{ r.open }}" tabIndex="0" aria-label="{{ r.aria }}" style="{{ r.style }}" style-hover="background: #f4f7fb;">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #9b9ea3;">{{ r.rank }}</span>
+                    <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                      <span style="font-size: 12.5px; font-weight: 500;">{{ r.district }}</span>
+                      <span style="font-size: 11px; color: #8a8d92; margin-left: 6px;">{{ r.requests }} req</span>
+                    </span>
+                    <span style="font-size: 11.5px; color: #4a4d52;">{{ r.category }}</span>
+                    <span style="text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; font-weight: 500;">{{ r.score }}</span>
+                    <span style="text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #4a4d52;">{{ r.demand }}</span>
+                    <span style="text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #4a4d52;">{{ r.gap }}</span>
+                    <span style="text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #a62b1f;">{{ r.offset }}</span>
+                    <span><span style="{{ r.badgeStyle }}">{{ r.status }}</span></span>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+          </div>
+
+          <sc-if value="{{ showComposition }}" hint-placeholder-val="{{ true }}">
+            <section style="background: #fff; border: 1px solid #e2e0da; border-radius: 6px; padding: 14px 15px 16px; margin-top: 12px;">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                <h2 style="margin: 0; font-size: 16px; font-weight: 600;">Score composition</h2>
+                <div style="display: flex; gap: 14px; margin-left: auto; font-size: 11.5px; color: #4a4d52;">
+                  <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 9px; height: 9px; border-radius: 2px; background: #1e5aa8;"></span>Citizen demand</span>
+                  <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 9px; height: 9px; border-radius: 2px; background: #6497bf;"></span>Infrastructure gap</span>
+                  <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 9px; height: 9px; border-radius: 2px; background: #cbb8a4;"></span>Investment offset</span>
+                </div>
+              </div>
+              <sc-for list="{{ composition }}" as="c" hint-placeholder-count="8">
+                <div style="display: grid; grid-template-columns: 132px minmax(0, 1fr) 52px; gap: 12px; align-items: center; padding: 5px 0;">
+                  <span style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ c.district }}</span>
+                  <span style="display: flex; height: 16px; border-radius: 2px; overflow: hidden; background: #f4f2ed;">
+                    <span style="{{ c.demandStyle }}"></span>
+                    <span style="{{ c.gapStyle }}"></span>
+                    <span style="{{ c.offsetStyle }}"></span>
+                  </span>
+                  <span style="text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500;">{{ c.score }}</span>
+                </div>
+              </sc-for>
+            </section>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isImpact }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="display: flex; align-items: flex-end; gap: 16px; margin-bottom: 16px;">
+            <div>
+              <h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -.015em;">Impact tracking</h1>
+              <div style="font-size: 13px; color: #6d7076; margin-top: 5px;">Funded projects against subsequent citizen feedback and indicator movement. Metric definitions are provisional.</div>
+            </div>
+            <div style="margin-left: auto; display: flex; gap: 8px;">
+              <div style="border: 1px solid #ddd9d1; background: #fff; border-radius: 4px; padding: 7px 11px; font-size: 12.5px;">All actioned projects ▾</div>
+              <button type="button" onClick="{{ openExport }}" style="border: 1px solid #ddd9d1; background: #fff; border-radius: 4px; padding: 7px 12px; font-size: 12.5px; font-family: inherit; cursor: pointer; color: #1a1c1e;" style-hover="border-color: #1e5aa8;">Export summary</button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;">
+            <sc-for list="{{ impactKpis }}" as="k" hint-placeholder-count="4">
+              <div style="background: #fff; border: 1px solid #e2e0da; border-radius: 6px; padding: 14px 15px 15px;">
+                <div style="font-size: 11.5px; color: #6d7076; min-height: 32px;">{{ k.label }}</div>
+                <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 8px;">
+                  <span style="font-size: 32px; font-weight: 600; font-family: 'IBM Plex Mono', monospace; letter-spacing: -.02em;">{{ k.value }}</span>
+                  <span style="{{ k.trendStyle }}">{{ k.trend }}</span>
+                </div>
+                <div style="font-size: 11px; color: #8a8d92; margin-top: 6px;">{{ k.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <section style="background: #fff; border: 1px solid #e2e0da; border-radius: 6px; padding: 15px 16px 18px; margin-top: 12px;">
+            <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 6px;">
+              <div>
+                <h2 style="margin: 0; font-size: 16px; font-weight: 600;">{{ trendTitle }}</h2>
+                <div style="font-size: 11.5px; color: #8a8d92; margin-top: 3px;">Composite score and citizen feedback volume since the funding decision</div>
+              </div>
+              <div style="margin-left: auto; display: flex; gap: 6px;">
+                <sc-for list="{{ projectTabs }}" as="t" hint-placeholder-count="4">
+                  <button type="button" onClick="{{ t.go }}" style="{{ t.style }}" style-hover="border-color: #1e5aa8;">{{ t.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display: flex; gap: 18px; font-size: 11.5px; color: #4a4d52; margin-bottom: 8px;">
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 2px; background: #1e5aa8;"></span>Composite score</span>
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 2px; background: #0f766e;"></span>Feedback volume (indexed)</span>
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 0; height: 12px; border-left: 2px dashed #a62b1f;"></span>Action date</span>
+            </div>
+            <div style="{{ chartWrapStyle }}">{{ chart }}</div>
+          </section>
+
+          <section style="background: #fff; border: 1px solid #e2e0da; border-radius: 6px; overflow: hidden; margin-top: 12px;">
+            <div style="display: grid; grid-template-columns: minmax(0, 1.6fr) 104px 74px 74px 96px 96px; gap: 8px; padding: 9px 14px; background: #fbfaf8; border-bottom: 1px solid #e8e5de; font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; color: #6d7076;">
+              <span>Project</span>
+              <span>Action date</span>
+              <span style="text-align: right;">Before</span>
+              <span style="text-align: right;">Latest</span>
+              <span>Trend</span>
+              <span style="text-align: right;">Re-engagement</span>
+            </div>
+            <sc-for list="{{ projects }}" as="p" hint-placeholder-count="6">
+              <div style="display: grid; grid-template-columns: minmax(0, 1.6fr) 104px 74px 74px 96px 96px; gap: 8px; padding: 11px 14px; border-bottom: 1px solid #f2efe9; align-items: center;" style-hover="background: #fbfaf8;">
+                <span style="min-width: 0;">
+                  <span style="display: block; font-size: 12.5px; font-weight: 500;">{{ p.name }}</span>
+                  <span style="display: block; font-size: 11px; color: #8a8d92; margin-top: 2px;">{{ p.category }}</span>
+                </span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #4a4d52;">{{ p.date }}</span>
+                <span style="text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #4a4d52;">{{ p.before }}</span>
+                <span style="text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; font-weight: 500;">{{ p.latest }}</span>
+                <span><span style="{{ p.trendStyle }}">{{ p.trend }}</span></span>
+                <span style="text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">{{ p.reengage }}</span>
+              </div>
+            </sc-for>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isData }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="margin-bottom: 16px;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -.015em;">Data sources &amp; provenance</h1>
+            <div style="font-size: 13px; color: #6d7076; margin-top: 5px;">What the fusion layer is built on for India / Bihar, and how fresh each feed is.</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px;">
+            <sc-for list="{{ sources }}" as="s" hint-placeholder-count="5">
+              <div style="background: #fff; border: 1px solid #e2e0da; border-radius: 6px; padding: 15px 16px 16px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: #8a8d92;">{{ s.kind }}</span>
+                  <span style="{{ s.statusStyle }}">{{ s.status }}</span>
+                </div>
+                <div style="font-size: 15px; font-weight: 600; margin-top: 8px;">{{ s.name }}</div>
+                <div style="font-size: 12px; color: #6d7076; margin-top: 4px; line-height: 1.5;">{{ s.detail }}</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; padding-top: 11px; border-top: 1px solid #f0ede7;">
+                  <div>
+                    <div style="font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #9b9ea3;">Last updated</div>
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; margin-top: 3px;">{{ s.updated }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #9b9ea3;">Coverage</div>
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; margin-top: 3px;">{{ s.coverage }}</div>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <section style="background: #fff; border: 1px solid #e2e0da; border-radius: 6px; padding: 15px 16px 17px; margin-top: 12px;">
+            <h2 style="margin: 0 0 4px; font-size: 16px; font-weight: 600;">Anonymization in effect</h2>
+            <div style="font-size: 12px; color: #6d7076; margin-bottom: 12px; line-height: 1.5;">Applied at intake, before any record reaches a policymaker-facing screen. Raw samples are visible only on the access-restricted privacy audit.</div>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px;">
+              <div style="border: 1px solid #ece9e3; border-radius: 5px; padding: 12px 13px; background: #fbfaf8;">
+                <div style="font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: #a62b1f; margin-bottom: 8px;">Before — raw intake (restricted)</div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; line-height: 1.7; color: #4a4d52;">
+                  <div>phone: +91 ●●●●● ●●●●●</div>
+                  <div>lat/lon: 26.1●●●, 85.3●●●</div>
+                  <div>text: "my name is ●●●●●, the road…"</div>
+                </div>
+              </div>
+              <div style="border: 1px solid #ece9e3; border-radius: 5px; padding: 12px 13px; background: #f7faf9;">
+                <div style="font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: #0f766e; margin-bottom: 8px;">After — as seen by policymakers</div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; line-height: 1.7; color: #4a4d52;">
+                  <div>id: sha256(salt + phone) → 9f3c…d41a</div>
+                  <div>unit: Muzaffarpur / Block 04</div>
+                  <div>text: "the road floods every monsoon…"</div>
+                </div>
+              </div>
+            </div>
+            <div style="font-size: 11.5px; color: #8a8d92; margin-top: 11px;">Method: salted SHA-256 identifier hashing · named-entity scrubbing on free text · location generalized to block centroid.</div>
+          </section>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+
+  <sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 50; display: flex; justify-content: flex-end;">
+      <div onClick="{{ closeDrawer }}" style="position: absolute; inset: 0; background: rgba(22, 24, 26, .28);"></div>
+      <div style="position: relative; width: 480px; max-width: 92vw; height: 100%; background: #fff; border-left: 1px solid #d9d5cc; box-shadow: -14px 0 40px rgba(20, 22, 24, .16); overflow-y: auto; animation: cipslide .22s ease both;">
+        <div style="position: sticky; top: 0; background: #fff; border-bottom: 1px solid #ece9e3; padding: 15px 18px 13px; z-index: 2;">
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <div>
+              <div style="font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #8a8d92;">Bihar / {{ sel.category }}</div>
+              <h2 style="margin: 4px 0 0; font-size: 20px; font-weight: 600;">{{ sel.district }}</h2>
+            </div>
+            <button type="button" onClick="{{ closeDrawer }}" style="margin-left: auto; border: 1px solid #ddd9d1; background: #fff; border-radius: 4px; width: 26px; height: 26px; cursor: pointer; color: #4a4d52; font-size: 13px; line-height: 1;">✕</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-top: 12px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 600;">{{ sel.score }}</span>
+            <span style="font-size: 11.5px; color: #6d7076;">composite<br />score</span>
+            <span style="{{ sel.badgeStyle }}">{{ sel.severity }}</span>
+            <span style="{{ sel.statusStyle }}">{{ sel.status }}</span>
+          </div>
+        </div>
+
+        <div style="padding: 16px 18px 28px;">
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+            <div style="border: 1px solid #ece9e3; border-radius: 5px; padding: 10px 11px;">
+              <div style="font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #8a8d92;">Demand</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 500; margin-top: 4px;">{{ sel.demand }}</div>
+            </div>
+            <div style="border: 1px solid #ece9e3; border-radius: 5px; padding: 10px 11px;">
+              <div style="font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #8a8d92;">Infra gap</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 500; margin-top: 4px;">{{ sel.gap }}</div>
+            </div>
+            <div style="border: 1px solid #ece9e3; border-radius: 5px; padding: 10px 11px;">
+              <div style="font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #8a8d92;">Invest. offset</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 500; margin-top: 4px; color: #a62b1f;">{{ sel.offset }}</div>
+            </div>
+          </div>
+
+          <div style="border: 1px solid #ece9e3; border-radius: 5px; padding: 13px 14px; margin-top: 12px; background: #fbfaf8;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="font-size: 13px; font-weight: 600;">Policymaker rationale</div>
+              <button type="button" onClick="{{ generate }}" style="margin-left: auto; border: 1px solid #ddd9d1; background: #fff; border-radius: 4px; padding: 5px 10px; font-size: 11.5px; font-family: inherit; cursor: pointer; color: #1a1c1e;" style-hover="border-color: #1e5aa8;">{{ rationaleBtn }}</button>
+            </div>
+            <div style="{{ rationaleStyle }}">{{ rationaleText }}</div>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-top: 12px; align-items: center;">
+            <button type="button" onClick="{{ actionHotspot }}" style="{{ actionStyle }}">{{ actionLabel }}</button>
+            <sc-if value="{{ sel.isActioned }}" hint-placeholder-val="{{ false }}">
+              <a href="#impact" onClick="{{ goImpact }}" style="font-size: 12.5px;">View full impact over time</a>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ sel.isActioned }}" hint-placeholder-val="{{ false }}">
+            <div style="border: 1px solid #d7e4e1; background: #f7faf9; border-radius: 5px; padding: 12px 13px; margin-top: 12px;">
+              <div style="font-size: 12.5px; font-weight: 600; color: #0f5d56;">Funded — before / after</div>
+              <div style="display: flex; align-items: baseline; gap: 12px; margin-top: 8px; font-family: 'IBM Plex Mono', monospace;">
+                <span style="font-size: 17px; color: #6d7076;">{{ sel.score }}</span>
+                <span style="color: #9b9ea3;">→</span>
+                <span style="font-size: 22px; font-weight: 600; color: #0f5d56;">{{ sel.after }}</span>
+                <span style="font-size: 12px; color: #0f766e;">{{ sel.delta }} since action</span>
+              </div>
+            </div>
+          </sc-if>
+
+          <div style="margin-top: 20px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="font-size: 13px; font-weight: 600;">Underlying citizen requests</div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #6d7076;">{{ sel.requests }}</span>
+              <span style="margin-left: auto; font-size: 11px; color: #8a8d92;">anonymized at intake</span>
+            </div>
+            <sc-for list="{{ requestList }}" as="q" hint-placeholder-count="4">
+              <div style="border: 1px solid #ece9e3; border-radius: 5px; padding: 11px 12px; margin-top: 8px;">
+                <div style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
+                  <span style="font-size: 10px; letter-spacing: .06em; text-transform: uppercase; background: #eef1f5; color: #4a4d52; border-radius: 3px; padding: 2px 6px;">{{ q.channel }}</span>
+                  <span style="font-size: 11.5px; color: #6d7076;">{{ q.unit }}</span>
+                  <span style="{{ q.urgencyStyle }}">{{ q.urgency }}</span>
+                  <span style="{{ q.flagStyle }}">{{ q.flag }}</span>
+                </div>
+                <div style="font-size: 12.5px; line-height: 1.55; margin-top: 8px; color: #2a2d31; text-wrap: pretty;">{{ q.text }}</div>
+                <div style="font-size: 10.5px; color: #9b9ea3; margin-top: 7px; font-family: 'IBM Plex Mono', monospace;">{{ q.meta }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ exportOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center;">
+      <div onClick="{{ closeExport }}" style="position: absolute; inset: 0; background: rgba(22, 24, 26, .3);"></div>
+      <div style="position: relative; width: 420px; max-width: 92vw; background: #fff; border-radius: 7px; border: 1px solid #d9d5cc; box-shadow: 0 20px 50px rgba(20, 22, 24, .2); padding: 18px 20px 20px; animation: cipfade .18s ease both;">
+        <div style="font-size: 17px; font-weight: 600;">Export report</div>
+        <div style="font-size: 12px; color: #6d7076; margin-top: 4px;">{{ exportScopeNote }}</div>
+        <div style="font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: #8a8d92; margin: 16px 0 7px;">Format</div>
+        <div style="display: flex; gap: 8px;">
+          <sc-for list="{{ formats }}" as="f" hint-placeholder-count="2">
+            <button type="button" onClick="{{ f.go }}" style="{{ f.style }}" style-hover="border-color: #1e5aa8;">
+              <span style="font-size: 12.5px; font-weight: 500;">{{ f.label }}</span>
+              <span style="font-size: 11px; color: #6d7076;">{{ f.sub }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: #8a8d92; margin: 16px 0 7px;">Scope</div>
+        <div style="display: flex; gap: 8px;">
+          <sc-for list="{{ scopes }}" as="s" hint-placeholder-count="2">
+            <button type="button" onClick="{{ s.go }}" style="{{ s.style }}" style-hover="border-color: #1e5aa8;">{{ s.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 20px; align-items: center;">
+          <button type="button" onClick="{{ closeExport }}" style="border: 1px solid #ddd9d1; background: #fff; border-radius: 4px; padding: 8px 13px; font-size: 12.5px; font-family: inherit; cursor: pointer; color: #1a1c1e;">Cancel</button>
+          <button type="button" onClick="{{ runExport }}" style="margin-left: auto; border: 1px solid #1e5aa8; background: #1e5aa8; color: #fff; border-radius: 4px; padding: 8px 15px; font-size: 12.5px; font-weight: 500; font-family: inherit; cursor: pointer;" style-hover="background: #164374;">{{ exportBtn }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 70; background: #1c2024; color: #fff; border-radius: 5px; padding: 10px 16px; font-size: 12.5px; box-shadow: 0 10px 24px rgba(20, 22, 24, .22); animation: cipfade .18s ease both;">{{ toast }}</div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;role&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;Policymaker&quot;, &quot;Analyst&quot;, &quot;Administrator&quot;], &quot;default&quot;: &quot;Policymaker&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Access&quot;}, &quot;mapRamp&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;Single-hue blue&quot;, &quot;ColorBrewer Oranges&quot;, &quot;Viridis&quot;], &quot;default&quot;: &quot;Single-hue blue&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Map&quot;}, &quot;showComposition&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Hotspot explorer&quot;}}">
+const RAMPS = {
+  "Single-hue blue": ["#f0f4f9", "#cddde9", "#9dbed6", "#6497bf", "#3a6f9e", "#1b4a78"],
+  "ColorBrewer Oranges": ["#feedde", "#fdd0a2", "#fdae6b", "#fd8d3c", "#e6550d", "#a63603"],
+  "Viridis": ["#fde725", "#addc30", "#5ec962", "#21918c", "#3b528b", "#440154"]
+};
+
+const BASE = [
+  ["West Champaran", "W Champ.", 2.21, "Roads"], ["East Champaran", "E Champ.", 2.34, "Water"],
+  ["Sitamarhi", "Sitamarhi", 2.11, "Sanitation"], ["Madhubani", "Madhubani", 2.02, "Water"],
+  ["Supaul", "Supaul", 2.27, "Roads"], ["Araria", "Araria", 2.41, "Health"],
+  ["Kishanganj", "Kishanganj", 1.98, "Schools"], ["Gopalganj", "Gopalganj", 1.57, "Roads"],
+  ["Siwan", "Siwan", 1.49, "Electricity"], ["Muzaffarpur", "Muzaffarpur", 2.14, "Roads"],
+  ["Darbhanga", "Darbhanga", 1.86, "Sanitation"], ["Saharsa", "Saharsa", 1.9, "Water"],
+  ["Purnia", "Purnia", 1.95, "Health"], ["Katihar", "Katihar", 2.08, "Roads"],
+  ["Saran", "Saran", 1.31, "Water"], ["Vaishali", "Vaishali", 1.12, "Electricity"],
+  ["Samastipur", "Samastipur", 1.73, "Roads"], ["Khagaria", "Khagaria", 1.66, "Sanitation"],
+  ["Begusarai", "Begusarai", 0.93, "Electricity"], ["Bhagalpur", "Bhagalpur", 1.18, "Health"],
+  ["Buxar", "Buxar", 0.81, "Schools"], ["Bhojpur", "Bhojpur", 0.74, "Roads"],
+  ["Patna", "Patna", 0.42, "Electricity"], ["Nalanda", "Nalanda", 0.88, "Water"],
+  ["Jehanabad", "Jehanabad", 0.96, "Schools"], ["Rohtas", "Rohtas", 1.05, "Roads"],
+  ["Aurangabad", "Aurangabad", 1.28, "Health"], ["Gaya", "Gaya", 1.62, "Sanitation"],
+  ["Nawada", "Nawada", 1.44, "Water"], ["Jamui", "Jamui", 1.52, "Schools"]
+];
+
+const REQUESTS = [
+  ["voice", "high", "The road to the block hospital floods every monsoon. Ambulances turn back and patients are carried on foot for two kilometres.", "duplicate cluster · 7 similar", "hi-IN · 41s · received 2 Sep"],
+  ["sms", "high", "No tar on the connecting road for three years. School children walk through mud from June to September.", "", "hi-IN · received 29 Aug"],
+  ["messaging", "medium", "Culvert collapsed near the panchayat office. Repaired once last year, broken again.", "burst flagged · 19 in 48h", "bho-IN · received 24 Aug"],
+  ["voice", "medium", "Requesting all-weather surface on the link road. The contractor left work unfinished after the first stretch.", "", "hi-IN · 28s · received 18 Aug"]
+];
+
+const PROJECTS = [
+  ["Muzaffarpur — rural road resurfacing", "Roads", "14 Mar 2026", 2.14, 1.42, "Improving", "62%"],
+  ["Madhubani — handpump rehabilitation", "Water", "02 Apr 2026", 2.02, 1.55, "Improving", "58%"],
+  ["Araria — block health sub-centre staffing", "Health", "21 Apr 2026", 2.41, 2.18, "Flat", "44%"],
+  ["Sitamarhi — sanitation block build-out", "Sanitation", "09 May 2026", 2.11, 1.61, "Improving", "51%"],
+  ["Gaya — drainage rebuild", "Sanitation", "27 May 2026", 1.62, 1.68, "Worsening", "37%"],
+  ["Katihar — feeder road upgrade", "Roads", "11 Jun 2026", 2.08, 1.74, "Improving", "49%"]
+];
+
+const SERIES = {
+  0: [2.14, 2.16, 2.11, 2.02, 1.88, 1.71, 1.58, 1.49, 1.42],
+  1: [2.02, 2.04, 1.99, 1.95, 1.86, 1.74, 1.66, 1.6, 1.55],
+  2: [2.41, 2.4, 2.38, 2.36, 2.3, 2.26, 2.22, 2.2, 2.18],
+  4: [1.62, 1.6, 1.58, 1.59, 1.61, 1.63, 1.65, 1.67, 1.68]
+};
+const FEEDBACK = {
+  0: [1.0, 1.12, 1.04, 0.86, 0.71, 0.58, 0.49, 0.44, 0.41],
+  1: [1.0, 0.98, 0.92, 0.88, 0.8, 0.72, 0.68, 0.64, 0.61],
+  2: [1.0, 1.04, 1.02, 1.06, 1.12, 1.18, 1.14, 1.1, 1.08],
+  4: [1.0, 1.02, 1.1, 1.18, 1.26, 1.34, 1.41, 1.48, 1.52]
+};
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
+
+class Component extends DCLogic {
+  state = {
+    screen: "overview", selectedId: null, actioned: { 9: true, 3: true, 5: true, 2: true, 27: true, 13: true },
+    rationale: {}, rationaleLoading: false, category: "All", query: "", sortDesc: true,
+    alertsOpen: false, exportOpen: false, toast: null, recomputing: false,
+    project: 0, format: "PDF summary", scope: "Current filtered view", exporting: false
+  };
+
+  ramp() { return RAMPS[this.props.mapRamp] || RAMPS["Single-hue blue"]; }
+
+  hotspots() {
+    return BASE.map((b, i) => {
+      const score = b[2];
+      const gap = +(score * 0.55 + 0.45).toFixed(2);
+      const offset = +(-(score * 0.15 + 0.12)).toFixed(2);
+      const demand = +((score - gap * 0.6 - offset) / 0.5).toFixed(2);
+      return {
+        id: i, district: b[0], short: b[1], category: b[3], score, demand, gap, offset,
+        requests: Math.round(demand * 23) + 6,
+        severity: score >= 1.6 ? "High severity" : score >= 1.1 ? "Medium" : "Low",
+        actioned: !!this.state.actioned[i]
+      };
+    });
+  }
+
+  badge(sev) {
+    const c = sev === "High severity" ? ["#fbeae8", "#8f231a"] : sev === "Medium" ? ["#fbf2e2", "#8a5600"] : ["#eef3ea", "#3a6427"];
+    return "display:inline-block;font-size:10.5px;font-weight:500;letter-spacing:.02em;border-radius:3px;padding:2px 7px;white-space:nowrap;background:" + c[0] + ";color:" + c[1];
+  }
+  statusBadge(actioned) {
+    return actioned
+      ? "display:inline-block;font-size:10.5px;font-weight:500;border-radius:3px;padding:2px 7px;background:#e9f2f0;color:#0f5d56;white-space:nowrap"
+      : "display:inline-block;font-size:10.5px;font-weight:500;border-radius:3px;padding:2px 7px;background:#f2efe9;color:#6d7076;white-space:nowrap";
+  }
+  trendChip(dir) {
+    const c = dir === "Improving" ? ["#e9f2f0", "#0f5d56"] : dir === "Worsening" ? ["#fbeae8", "#8f231a"] : ["#f2efe9", "#6d7076"];
+    return "display:inline-block;font-size:10.5px;font-weight:500;border-radius:3px;padding:2px 7px;background:" + c[0] + ";color:" + c[1];
+  }
+  cellStyle(score, h, selected) {
+    const r = this.ramp();
+    const step = score >= 2.2 ? 5 : score >= 1.9 ? 4 : score >= 1.5 ? 3 : score >= 1.1 ? 2 : score >= 0.8 ? 1 : 0;
+    const dark = this.props.mapRamp === "Viridis" ? step >= 3 : step >= 3;
+    return "display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;gap:6px;height:" + h +
+      "px;border-radius:3px;padding:6px 7px;cursor:pointer;font-family:inherit;text-align:left;background:" + r[step] +
+      ";color:" + (dark ? "#ffffff" : "#1a1c1e") + ";border:" + (selected ? "2px solid #1a1c1e" : "1px solid rgba(26,28,30,.08)");
+  }
+
+  toast(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2600); }
+
+  chartEl() {
+    const W = 980, H = 240, pad = 34;
+    const s = SERIES[this.state.project] || SERIES[0];
+    const f = FEEDBACK[this.state.project] || FEEDBACK[0];
+    const x = i => pad + (i * (W - pad * 2)) / (s.length - 1);
+    const ys = v => H - 26 - ((v - 1.2) / 1.5) * (H - 60);
+    const yf = v => H - 26 - ((v - 0.3) / 1.4) * (H - 60);
+    const line = (arr, fn) => arr.map((v, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + fn(v).toFixed(1)).join(" ");
+    const e = React.createElement;
+    const grid = [0, 1, 2, 3].map(g =>
+      e("line", { key: "g" + g, x1: pad, x2: W - pad, y1: 20 + g * ((H - 46) / 3), y2: 20 + g * ((H - 46) / 3), stroke: "#f0ede7", strokeWidth: 1 })
+    );
+    const labels = MONTHS.map((m, i) =>
+      e("text", { key: "m" + i, x: x(i), y: H - 6, fill: "#9b9ea3", fontSize: 10.5, textAnchor: "middle", fontFamily: "'IBM Plex Mono', monospace" }, m)
+    );
+    const actionIdx = 2;
+    return e("svg", { viewBox: "0 0 " + W + " " + H, style: { width: "100%", height: "240px", display: "block" }, role: "img", "aria-label": "Composite score and feedback volume trend" }, [
+      ...grid,
+      e("line", { key: "a", x1: x(actionIdx), x2: x(actionIdx), y1: 14, y2: H - 22, stroke: "#a62b1f", strokeWidth: 1.5, strokeDasharray: "4 4" }),
+      e("text", { key: "al", x: x(actionIdx) + 6, y: 24, fill: "#a62b1f", fontSize: 10.5, fontFamily: "'IBM Plex Mono', monospace" }, "action"),
+      e("path", { key: "f", d: line(f, yf), fill: "none", stroke: "#0f766e", strokeWidth: 2 }),
+      e("path", { key: "s", d: line(s, ys), fill: "none", stroke: "#1e5aa8", strokeWidth: 2.5 }),
+      ...s.map((v, i) => e("circle", { key: "c" + i, cx: x(i), cy: ys(v), r: 3, fill: "#fff", stroke: "#1e5aa8", strokeWidth: 1.75 })),
+      ...labels
+    ]);
+  }
+
+  renderVals() {
+    const st = this.state;
+    const role = this.props.role || "Policymaker";
+    const all = this.hotspots();
+    const sorted = all.slice().sort((a, b) => (st.sortDesc ? b.score - a.score : a.score - b.score));
+    const ranked = all.slice().sort((a, b) => b.score - a.score);
+    const rankOf = {}; ranked.forEach((h, i) => { rankOf[h.id] = i + 1; });
+
+    const nav = [["overview", "Overview"], ["hotspots", "Hotspot explorer"], ["impact", "Impact tracking"], ["data", "Data & provenance"]].map(n => ({
+      label: n[1],
+      go: () => this.setState({ screen: n[0], alertsOpen: false }),
+      style: "display:flex;align-items:center;gap:9px;width:100%;text-align:left;border:0;border-radius:4px;padding:8px 9px;font-family:inherit;font-size:12.5px;cursor:pointer;background:" +
+        (st.screen === n[0] ? "#2e343a" : "transparent") + ";color:" + (st.screen === n[0] ? "#ffffff" : "#b9bec4")
+    }));
+
+    const adminStyle = "display:flex;align-items:center;gap:9px;padding:8px 9px;font-size:12.5px;color:#767c82;border-radius:4px;opacity:" +
+      (role === "Administrator" ? "1" : ".45");
+    const adminNav = [["Nations & localization", "Wizard"], ["Users & roles", "CRUD"], ["Privacy audit", "Restricted"]]
+      .map(a => ({ label: a[0], tag: a[1], style: adminStyle }));
+
+    const filtered = sorted.filter(h =>
+      (st.category === "All" || h.category === st.category) &&
+      (!st.query || h.district.toLowerCase().indexOf(st.query.toLowerCase()) >= 0)
+    );
+
+    const open = id => () => this.setState({ selectedId: id, alertsOpen: false });
+
+    const sel = all.find(h => h.id === st.selectedId) || null;
+    const selVals = sel ? {
+      district: sel.district, category: sel.category, score: sel.score.toFixed(2), demand: sel.demand.toFixed(2),
+      gap: sel.gap.toFixed(2), offset: sel.offset.toFixed(2), severity: sel.severity, requests: sel.requests + " requests",
+      badgeStyle: this.badge(sel.severity), statusStyle: this.statusBadge(sel.actioned),
+      status: sel.actioned ? "Funded / actioned" : "Not actioned", isActioned: sel.actioned,
+      after: (sel.score - 0.58).toFixed(2), delta: "−0.58"
+    } : {};
+
+    const rationaleKey = sel ? sel.id : -1;
+    const hasRationale = !!st.rationale[rationaleKey];
+    const rationaleText = st.rationaleLoading
+      ? "Generating…"
+      : hasRationale
+        ? st.rationale[rationaleKey]
+        : "Not generated yet. The rationale cites the request volume, the demographic weight applied, the infrastructure-gap indicator used, and any overlapping investment plan.";
+
+    const impactKpis = [
+      { label: "Projects marked funded / actioned", value: "6", trend: "+2 this quarter", sub: "of 142 ranked hotspots" },
+      { label: "Average composite score reduction", value: "0.42", trend: "improving", sub: "since action date, all projects" },
+      { label: "Share with improved indicator", value: "67%", trend: "4 of 6", sub: "infrastructure index movement" },
+      { label: "Citizen re-engagement response rate", value: "50%", trend: "−3 pts", sub: "follow-up requests answered" }
+    ].map(k => ({
+      ...k,
+      trendStyle: "font-size:11px;color:" + (k.trend.indexOf("−") === 0 ? "#8f231a" : "#0f5d56") + ";font-weight:500"
+    }));
+
+    const chipStyle = on => "border:1px solid " + (on ? "#1e5aa8" : "#ddd9d1") + ";background:" + (on ? "#eaf1f9" : "#fff") +
+      ";color:" + (on ? "#164374" : "#4a4d52") + ";border-radius:4px;padding:6px 10px;font-size:12px;font-family:inherit;cursor:pointer;min-height:32px";
+
+    return {
+      roleLabel: role + " · India",
+      nav, adminNav,
+      isOverview: st.screen === "overview", isHotspots: st.screen === "hotspots",
+      isImpact: st.screen === "impact", isData: st.screen === "data",
+      goHotspots: () => this.setState({ screen: "hotspots", alertsOpen: false }),
+      goImpact: () => this.setState({ screen: "impact", selectedId: null }),
+
+      alertsOpen: st.alertsOpen,
+      toggleAlerts: () => this.setState({ alertsOpen: !st.alertsOpen }),
+      alerts: [
+        { text: "New high-severity hotspot: Araria / Health crossed 2.40", when: "today 06:12", dot: "width:7px;height:7px;border-radius:50%;background:#a62b1f;margin-top:5px;flex:none" },
+        { text: "Investment-plan feed (PMGSY) is stale — last refresh 104 days ago", when: "yesterday 22:40", dot: "width:7px;height:7px;border-radius:50%;background:#b26a00;margin-top:5px;flex:none" },
+        { text: "Score recompute finished — 142 hotspots updated", when: "12 Sep 04:26", dot: "width:7px;height:7px;border-radius:50%;background:#1e5aa8;margin-top:5px;flex:none" }
+      ],
+
+      kpis: [
+        { label: "Active hotspots", value: "142", trend: "+9", sub: "28 districts, 6 categories" },
+        { label: "Unaddressed high severity", value: "23", trend: "+4", sub: "score ≥ 1.60, no funding marked" },
+        { label: "Citizen requests fused (90d)", value: "18.4k", trend: "+12%", sub: "voice, SMS and messaging intake" },
+        { label: "Marked funded / actioned", value: "6", trend: "+2", sub: "tracked on Impact" }
+      ].map(k => ({
+        ...k, go: () => this.setState({ screen: "hotspots" }),
+        trendStyle: "font-size:11px;color:" + (k.label.indexOf("Unaddressed") === 0 ? "#8f231a" : "#0f5d56") + ";font-weight:500"
+      })),
+
+      legend: (this.ramp()).map(c => ({ style: "display:inline-block;width:13px;height:9px;background:" + c })),
+
+      cells: BASE.map((b, i) => {
+        const h = all[i];
+        return {
+          short: h.short, score: h.score.toFixed(2),
+          aria: h.district + ": composite score " + h.score.toFixed(2) + ", " + h.severity.toLowerCase() + ", category " + h.category,
+          go: open(h.id),
+          style: this.cellStyle(h.score, 52, st.selectedId === h.id),
+          styleLg: this.cellStyle(h.score, 66, st.selectedId === h.id)
+        };
+      }),
+
+      topFive: ranked.slice(0, 5).map(h => ({
+        rank: rankOf[h.id], district: h.district, category: h.category, requests: h.requests,
+        score: h.score.toFixed(2), severity: h.severity, badgeStyle: this.badge(h.severity), open: open(h.id)
+      })),
+
+      activity: [
+        { when: "today 06:12", text: "Araria / Health entered the top 3 after 214 new requests in 14 days", tag: "New hotspot" },
+        { when: "11 Sep", text: "Katihar / Roads marked funded by S. Mehrotra — feeder road upgrade", tag: "Actioned" },
+        { when: "09 Sep", text: "Investment-plan feed flagged stale; offset component may understate coverage", tag: "Data" },
+        { when: "06 Sep", text: "Burst detection grouped 19 Khagaria submissions as one duplicate cluster", tag: "Pipeline" }
+      ].map(a => ({
+        ...a,
+        tagStyle: "font-size:10.5px;letter-spacing:.04em;border-radius:3px;padding:2px 7px;white-space:nowrap;background:" +
+          (a.tag === "New hotspot" ? "#fbeae8;color:#8f231a" : a.tag === "Actioned" ? "#e9f2f0;color:#0f5d56" : "#f2efe9;color:#6d7076")
+      })),
+
+      categoryChips: ["All", "Roads", "Water", "Electricity", "Health", "Sanitation", "Schools"].map(c => ({
+        label: c, go: () => this.setState({ category: c }), style: chipStyle(st.category === c)
+      })),
+      query: st.query,
+      setQuery: e => this.setState({ query: e.target.value }),
+      resultCount: filtered.length + " of 142 hotspots",
+      scoreHeader: st.sortDesc ? "Score ↓" : "Score ↑",
+      sortScore: () => this.setState({ sortDesc: !st.sortDesc }),
+      sortDistrict: () => this.setState({ sortDesc: !st.sortDesc }),
+      recompute: () => {
+        this.setState({ recomputing: true });
+        setTimeout(() => { this.setState({ recomputing: false }); this.toast("Scores recomputed — updated 142 hotspots"); }, 1100);
+      },
+      recomputeLabel: st.recomputing ? "Recomputing…" : "Recompute scores",
+
+      rows: filtered.map(h => ({
+        rank: rankOf[h.id], district: h.district, category: h.category, requests: h.requests,
+        score: h.score.toFixed(2), demand: h.demand.toFixed(2), gap: h.gap.toFixed(2), offset: h.offset.toFixed(2),
+        status: h.actioned ? "Actioned" : h.severity === "High severity" ? "Open · high" : "Open",
+        badgeStyle: this.statusBadge(h.actioned),
+        aria: h.district + ", " + h.category + ", composite score " + h.score.toFixed(2) + ", " + h.severity.toLowerCase(),
+        open: open(h.id),
+        style: "display:grid;grid-template-columns:34px minmax(0,1.5fr) 82px 58px 58px 58px 62px 78px;gap:6px;align-items:center;padding:10px 12px;border-bottom:1px solid #f2efe9;cursor:pointer;background:" +
+          (st.selectedId === h.id ? "#eef4fa" : "transparent")
+      })),
+
+      showComposition: this.props.showComposition !== false,
+      composition: ranked.slice(0, 8).map(h => {
+        const total = h.demand * 0.5 + h.gap * 0.6 + Math.abs(h.offset);
+        const w = v => ((v / total) * 100).toFixed(1) + "%";
+        return {
+          district: h.district, score: h.score.toFixed(2),
+          demandStyle: "display:block;height:100%;background:#1e5aa8;width:" + w(h.demand * 0.5),
+          gapStyle: "display:block;height:100%;background:#6497bf;width:" + w(h.gap * 0.6),
+          offsetStyle: "display:block;height:100%;background:#cbb8a4;width:" + w(Math.abs(h.offset))
+        };
+      }),
+
+      drawerOpen: !!sel,
+      closeDrawer: () => this.setState({ selectedId: null }),
+      sel: selVals,
+      rationaleBtn: hasRationale ? "Regenerate" : "Generate",
+      rationaleText,
+      rationaleStyle: "font-size:12.5px;line-height:1.6;margin-top:9px;text-wrap:pretty;color:" +
+        (hasRationale ? "#2a2d31" : "#8a8d92") + (st.rationaleLoading ? ";animation:cippulse 1.1s ease-in-out infinite" : ""),
+      generate: () => {
+        if (!sel) return;
+        this.setState({ rationaleLoading: true });
+        setTimeout(() => {
+          const txt = sel.district + " ranks " + rankOf[sel.id] + " of 142 on composite demand. " + sel.requests +
+            " anonymized citizen requests in the last 90 days name " + sel.category.toLowerCase() +
+            " as the dominant need, weighted by a district population of 3.1 million with 71% rural residence. The infrastructure-gap indicator sits at " +
+            sel.gap.toFixed(2) + ", above the state median of 1.34. Existing investment plans offset " +
+            Math.abs(sel.offset).toFixed(2) + " of that gap, covering two of eleven affected blocks, which leaves the remainder unaddressed in the current cycle.";
+          this.setState({ rationaleLoading: false, rationale: { ...this.state.rationale, [sel.id]: txt } });
+        }, 900);
+      },
+      actionLabel: sel && sel.actioned ? "Already marked funded" : "Mark as funded / actioned",
+      actionStyle: "border-radius:4px;padding:9px 14px;font-size:12.5px;font-weight:500;font-family:inherit;border:1px solid " +
+        (sel && sel.actioned ? "#e2e0da;background:#f6f5f2;color:#9b9ea3;cursor:default" : "#1e5aa8;background:#1e5aa8;color:#fff;cursor:pointer"),
+      actionHotspot: () => {
+        if (!sel || sel.actioned) return;
+        this.setState({ actioned: { ...this.state.actioned, [sel.id]: true } });
+        this.toast(sel.district + " marked funded — now tracked on Impact");
+      },
+      requestList: REQUESTS.map((r, i) => ({
+        channel: r[0], urgency: "urgency: " + r[1], text: r[2], flag: r[3],
+        unit: (sel ? sel.district : "—") + " / Block " + (i + 2) * 3,
+        meta: r[4],
+        urgencyStyle: "font-size:10px;letter-spacing:.04em;border-radius:3px;padding:2px 6px;background:" +
+          (r[1] === "high" ? "#fbeae8;color:#8f231a" : "#fbf2e2;color:#8a5600"),
+        flagStyle: r[3] ? "font-size:10px;border-radius:3px;padding:2px 6px;background:#f2efe9;color:#6d7076" : "display:none"
+      })),
+
+      impactKpis,
+      trendTitle: PROJECTS[st.project][0],
+      projectTabs: [0, 1, 2, 4].map(i => ({
+        label: PROJECTS[i][0].split(" — ")[0], go: () => this.setState({ project: i }), style: chipStyle(st.project === i)
+      })),
+      chartWrapStyle: "margin-top:4px",
+      chart: this.chartEl(),
+      projects: PROJECTS.map(p => ({
+        name: p[0], category: p[1], date: p[2], before: p[3].toFixed(2), latest: p[4].toFixed(2),
+        trend: p[5], reengage: p[6], trendStyle: this.trendChip(p[5])
+      })),
+
+      sources: [
+        { kind: "Demographic", name: "Census of India 2011", status: "Connected", detail: "District and block population, rural share, literacy, SC/ST composition. Used as the demographic weight in scoring.", updated: "static", coverage: "28 / 28 districts" },
+        { kind: "Infrastructure index", name: "NFHS-5", status: "Connected", detail: "Household access to improved water, sanitation, electricity and health facilities. Drives the infrastructure-gap component.", updated: "2021 round", coverage: "28 / 28 districts" },
+        { kind: "Investment plans", name: "PMGSY road sanctions", status: "Stale — 104 days", detail: "Sanctioned and in-progress road works. Subtracted as investment offset. A stale feed may understate existing coverage.", updated: "01 Jun 2026", coverage: "26 / 28 districts" },
+        { kind: "Citizen intake", name: "Voice / SMS / messaging gateway", status: "Connected", detail: "Anonymized at intake, deduplicated and burst-flagged before fusion. No raw PII crosses into this platform.", updated: "12 Sep 04:10", coverage: "18,412 requests (90d)" },
+        { kind: "Administrative geometry", name: "LGD district & block codes", status: "Connected", detail: "Canonical administrative unit codes used to join every feed. Location is generalized to block centroid.", updated: "22 Aug 2026", coverage: "28 districts, 534 blocks" }
+      ].map(s => ({
+        ...s,
+        statusStyle: "font-size:10.5px;font-weight:500;border-radius:3px;padding:2px 7px;background:" +
+          (s.status === "Connected" ? "#e9f2f0;color:#0f5d56" : "#fbf2e2;color:#8a5600")
+      })),
+
+      exportOpen: st.exportOpen,
+      openExport: () => this.setState({ exportOpen: true }),
+      closeExport: () => this.setState({ exportOpen: false, exporting: false }),
+      exportScopeNote: "Bihar · " + filtered.length + " hotspots in the current view · " + st.category.toLowerCase() + " categories",
+      formats: ["PDF summary", "CSV raw rows"].map(f => ({
+        label: f, sub: f === "PDF summary" ? "ranked list, map, rationale" : "one row per hotspot",
+        go: () => this.setState({ format: f }),
+        style: "flex:1;display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;border:1px solid " +
+          (st.format === f ? "#1e5aa8" : "#ddd9d1") + ";background:" + (st.format === f ? "#eaf1f9" : "#fff") +
+          ";border-radius:5px;padding:10px 11px;font-family:inherit;cursor:pointer"
+      })),
+      scopes: ["Current filtered view", "Full region", "Full nation"].map(s => ({
+        label: s, go: () => this.setState({ scope: s }), style: chipStyle(st.scope === s)
+      })),
+      exportBtn: st.exporting ? "Preparing…" : "Export",
+      runExport: () => {
+        this.setState({ exporting: true });
+        setTimeout(() => { this.setState({ exportOpen: false, exporting: false }); this.toast(st.format + " ready — download started"); }, 1000);
+      },
+      toast: st.toast
+    };
+  }
+}
+
+</script>
+</body>
+</html>

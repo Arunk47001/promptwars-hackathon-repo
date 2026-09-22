@@ -1,15 +1,21 @@
 /**
- * One-off prep script (part of C4/C13 support): converts the real Bihar
- * district-boundary TopoJSON (datameet/indian-district-boundaries) to
- * GeoJSON, renames each district's `district` property to the canonical
- * Census/NFHS spelling used elsewhere in this app (see
+ * One-off prep script (part of C4/C13 support): converts the real
+ * Karnataka district-boundary TopoJSON (datameet/indian-district-
+ * boundaries) to GeoJSON, renames each district's `district` property to
+ * the canonical Census/NFHS spelling used elsewhere in this app (see
  * scripts/ingest/config.ts), and writes the result to
- * public/data/bihar-districts.geojson for the dashboard's React-Leaflet
- * choropleth map (C13) to load as a static asset.
+ * public/data/karnataka-districts.geojson for the dashboard's
+ * React-Leaflet choropleth map (C13) to load as a static asset.
  *
- * Source: https://raw.githubusercontent.com/datameet/indian-district-boundaries/master/topojson/state-wise/bihar.json
+ * Source: https://raw.githubusercontent.com/datameet/indian-district-boundaries/master/topojson/state-wise/karnataka.json
  * (2011 Census district boundaries, per that repo's `year: "2011_c"`
- * property - consistent with the Census 2011 vintage used elsewhere).
+ * property - consistent with the Census 2011 vintage used elsewhere;
+ * confirmed live during the C1 verification spike to publish 30 district
+ * features, matching Karnataka's Census/NFHS district count. Note: this
+ * source spells 12 of the 30 districts using the post-2014 official
+ * Kannada-transliteration renames rather than the Census/NFHS spellings -
+ * reconciled via EXTERNAL_DISTRICT_NAME_ALIASES in config.ts, same as the
+ * PMGSY MasterData abbreviations).
  *
  * Run with: npx tsx scripts/ingest/prepare-district-boundaries.ts
  */
@@ -19,18 +25,18 @@ import * as topojsonClient from "topojson-client";
 import { getCanonicalDisplayName } from "./config";
 
 const SOURCE_URL =
-  "https://raw.githubusercontent.com/datameet/indian-district-boundaries/master/topojson/state-wise/bihar.json";
+  "https://raw.githubusercontent.com/datameet/indian-district-boundaries/master/topojson/state-wise/karnataka.json";
 const OUTPUT_PATH = path.resolve(
   __dirname,
   "..",
   "..",
   "public",
   "data",
-  "bihar-districts.geojson"
+  "karnataka-districts.geojson"
 );
 
 async function main() {
-  console.log(`Fetching Bihar district boundaries from ${SOURCE_URL} ...`);
+  console.log(`Fetching Karnataka district boundaries from ${SOURCE_URL} ...`);
   const res = await fetch(SOURCE_URL);
   if (!res.ok) {
     throw new Error(`Failed to fetch topojson: ${res.status} ${res.statusText}`);

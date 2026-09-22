@@ -1,4 +1,4 @@
-# BRICS Citizen Infrastructure Platform (India / Bihar demo)
+# BRICS Citizen Infrastructure Platform (India / Karnataka demo)
 
 A multilingual-capable, multi-channel citizen-intake pipeline (Twilio
 Voice/SMS/WhatsApp) that anonymizes real citizen submissions, fuses them
@@ -21,10 +21,10 @@ Twilio account, no Google AI Studio (Gemini) API key, and no live Upstash
 account. To be transparent about exactly what that means:
 
 - **Real data, live-fetched**: Census 2011, NFHS-5, and PMGSY reference
-  data for Bihar are fetched from real public-data mirrors at ingestion
-  time (see `docs/dataset-provenance.md` for exact sources, caveats, and
-  two disclosed proxy substitutions). Nothing in the reference tables is
-  fabricated.
+  data for Karnataka are fetched from real public-data mirrors at
+  ingestion time (see `docs/dataset-provenance.md` for exact sources,
+  caveats, and disclosed proxy/spelling substitutions). Nothing in the
+  reference tables is fabricated.
 - **Code-complete but unverified against the live service**: the Twilio
   webhook routes, the Upstash-backed queue, and the Gemini extraction/
   rationale calls are fully implemented and unit/integration-tested with
@@ -102,19 +102,19 @@ npm run migrate
 Applies every file in `/migrations` in order against the local Postgres
 (idempotent - safe to re-run). See `SCHEMA.md` for the full schema.
 
-### 5. Ingest real reference data (Bihar demo scope)
+### 5. Ingest real reference data (Karnataka demo scope)
 
 ```bash
 npm run ingest
 ```
 
-Fetches and loads real Census 2011 / NFHS-5 / PMGSY data for Bihar's 38
-districts. See `docs/dataset-provenance.md` for exact sources and
+Fetches and loads real Census 2011 / NFHS-5 / PMGSY data for Karnataka's
+30 districts. See `docs/dataset-provenance.md` for exact sources and
 disclosed caveats/substitutions, and run
 `npx tsx scripts/ingest/prepare-district-boundaries.ts` once to fetch the
 real district-boundary GeoJSON the dashboard map uses
-(`public/data/bihar-districts.geojson` - already generated in this repo,
-re-run only if you want to refresh it).
+(`public/data/karnataka-districts.geojson` - already generated in this
+repo, re-run only if you want to refresh it).
 
 ### 6. Run the app
 
@@ -205,36 +205,84 @@ app/                  Next.js App Router: pages + API route handlers
   api/webhooks/        Twilio Voice/SMS/WhatsApp intake routes (C5)
   api/worker/process/  Queue-invoked async processing worker (C7)
   api/hotspots/        Hotspot list/detail/rationale/action routes (C10-C12)
+  api/impact/          Real actioned-hotspot list w/ before/after scores
+                        (Impact tracking screen; redesign C6)
+  api/data-sources/    Real per-reference-table coverage counts
+                        (Data sources & provenance screen; redesign C7)
   api/debug/           Anonymization before/after sample route (C8)
-  dashboard/           Policymaker dashboard page (C13)
-components/           Dashboard React components (map, table, panels)
+  dashboard/           Dashboard route - mounts components/dashboard/DashboardApp
+components/
+  dashboard/           Redesigned dashboard shell + screens (sidebar/header,
+                        Overview/Hotspot explorer/Impact tracking/Data &
+                        provenance, hotspot drawer, export modal) - see
+                        .squad/task/redesign-dashboard-per-design-canvas.md
+  HotspotMap.tsx       Real Leaflet choropleth (district GeoJSON) - kept in
+                        the codebase but not wired into the redesigned
+                        screens by default, which use a compact colored
+                        district-cell grid instead, per the design's IA
+                        (components/dashboard/DistrictGrid.tsx)
+  AnonymizationToggle/ Shared components reused as-is by the new screens
+  SeverityBadge.tsx
 lib/                  Core domain logic (db, anonymize, spam, scoring,
-                       gemini, queue, twilio, intake, worker, impact)
+                       gemini, queue, twilio, intake, worker, impact) plus
+                       lib/theme.ts, lib/colorScale.ts, lib/region.ts,
+                       lib/dashboardMetrics.ts (redesign design-tokens /
+                       shared color-scale / real KPI-and-CSV logic)
 migrations/           Numbered SQL migrations (C3) - see SCHEMA.md
 scripts/
   migrate.ts           Migration runner
   ingest/              Census/NFHS/PMGSY ingestion scripts (C4)
 tests/                 Vitest unit + integration tests (C14)
 docs/                  Dataset provenance, Gemini spike status
-public/data/           Real Bihar district-boundary GeoJSON (map layer)
+public/data/           Real Karnataka district-boundary GeoJSON (map layer)
 ```
+
+## Dashboard IA (redesigned per `design/BRICS Citizen Infrastructure Platform.dc.html`)
+
+`/dashboard` is a sidebar+header shell (`components/dashboard/DashboardApp.tsx`)
+with four screens, switched via client-side state (not separate routes -
+see that file's docblock for why):
+
+- **Overview** - real KPI cards, a compact colored district-cell grid, a
+  top-hotspots list, and a recent-activity feed built only from event types
+  with real backing data (actioned hotspots + latest score-recompute wave).
+- **Hotspot explorer** - the evolution of the old single-page dashboard:
+  category filter chips, search, the district grid + ranked sortable table
+  side by side, and a restyled score-composition chart. "Recompute scores"
+  still calls the real `POST /api/hotspots`.
+- **Impact tracking** - real actioned-hotspot KPIs/table from
+  `GET /api/impact`, with a real two-point before/after chart per project
+  (not a fabricated monthly time series - the schema doesn't store one).
+- **Data sources & provenance** - one card per reference dataset with a
+  live `count(*)`-backed coverage figure from `GET /api/data-sources`, plus
+  the existing anonymization before/after panel.
+
+Clicking a hotspot opens a right-side slide-over drawer
+(`components/dashboard/HotspotDrawer.tsx`, replacing the old inline
+`DetailPanel` block) with the real rationale/action/requests flows
+unchanged underneath. A top-bar role selector (Policymaker/Analyst/
+Administrator) is **client-side only, not real auth** - it just visually
+gates the sidebar's Admin nav section, matching the design's own scope (see
+`.squad/coder/redesign-dashboard-per-design-canvas.md` for the full
+disclosure of what is and isn't real in this redesign).
 
 ## Demo script (anonymization + impact-tracking walkthrough)
 
-1. Run `npm run dev`, open `/dashboard`. It loads with real Bihar
+1. Run `npm run dev`, open `/dashboard`. It loads with real Karnataka
    reference data but no citizen submissions yet (run ingestion + a couple
    of curl-simulated submissions per steps 5/7 above first, then
    `POST /api/hotspots` to compute scores, for a populated demo).
-2. Point at the **Anonymization debug view** panel: click "Show AFTER" /
-   "Show BEFORE" to toggle between a real submission's raw intake-only
-   record (plaintext phone, un-redacted text, precise GPS if present) and
-   its anonymized clean record (salted phone hash, PII-scrubbed
-   description, district-level location only). See `lib/anonymize.ts` and
+2. Go to the **Data & provenance** screen and point at the
+   **Anonymization in effect** panel: click "Show AFTER" / "Show BEFORE" to
+   toggle between a real submission's raw intake-only record (plaintext
+   phone, un-redacted text, precise GPS if present) and its anonymized
+   clean record (salted phone hash, PII-scrubbed description,
+   district-level location only). See `lib/anonymize.ts` and
    `app/api/debug/anonymization-sample/route.ts`.
-3. Click a row in the ranked hotspot table (or a district on the map) to
-   open the **drill-down detail panel**: shows the underlying anonymized
-   citizen requests for that district+category, with duplicate/burst
-   flags visible.
+3. On the **Hotspot explorer** screen, click a row in the ranked table (or
+   a cell in the district grid) to open the **hotspot detail drawer**:
+   shows the underlying anonymized citizen requests for that
+   district+category, with duplicate/burst flags visible.
 4. Click **"Generate policymaker rationale"** to call Gemini 2.5 Pro for a
    written explanation referencing that hotspot's actual figures (requires
    a real `GEMINI_API_KEY`).

@@ -1,35 +1,43 @@
 /**
  * Shared config for the C4 ingestion scripts.
  *
- * Demo geographic scope: BIHAR.
+ * Demo geographic scope: KARNATAKA (re-scoped from Bihar; see
+ * .squad/task/rescope-demo-state-bihar-to-karnataka.md and the "Demo
+ * scope" section of docs/dataset-provenance.md for the full rationale and
+ * source citations).
  *
- * Why Bihar (per the plan's "scoping note" - a build-time convenience, not
- * a decision needing sign-off): of the states checked against the three
- * real datasets actually reachable in this build environment (see
- * docs/dataset-provenance.md for exact sources), Bihar had complete,
- * consistent district lists across all three sources without extra name
- * reconciliation:
- *   - Census 2011 district table: 38 Bihar districts.
- *   - NFHS-5 district factsheet CSV: 38 Bihar districts (exact name match
- *     to the Census list after case/whitespace normalization).
- *   - PMGSY open habitation/road-proposal data: a Bihar-specific export
- *     (Bihar.zip) is published directly, with per-district habitation and
- *     proposed-road records.
- * That three-way clean overlap is what the plan's C4 acceptance criteria
- * asks for ("cleanest/most complete coverage"), so Bihar was chosen over
- * scanning all 36 states/UTs for an even-cleaner match given the build
- * time available.
+ * Why Karnataka is viable in the same mirrors used for Bihar (confirmed by
+ * the C1 verification spike, live-fetched on 2026-09-14): all four sources
+ * previously scoped to Bihar also publish complete Karnataka data:
+ *   - Census 2011 district table (RajaBhavesh mirror): 30 Karnataka rows
+ *     (State_name = "KARNATAKA").
+ *   - NFHS-5 district factsheet CSV (pratapvardhan/NFHS-5 mirror): 3120
+ *     rows across the same 30 districts, spelled identically to the
+ *     Census list.
+ *   - PMGSY open habitation/road-proposal data (datameet/pmgsy-geosadak):
+ *     state-specific exports Habitation/Karnataka.zip (200 OK, valid
+ *     shapefile .dbf) and Proposals/Karnataka.zip (200 OK, valid
+ *     shapefile .dbf) are published directly, plus 30 Karnataka rows in
+ *     MasterData.xls's district-ID lookup (STATE_NAME = "Karnataka").
+ *   - District-boundary topojson (datameet/indian-district-boundaries):
+ *     topojson/state-wise/karnataka.json publishes 30 district features,
+ *     year "2011_c" (2011 Census vintage, consistent with the other
+ *     sources).
+ * Unlike Bihar, Karnataka's PMGSY MasterData/boundary-topojson spellings
+ * diverge from the Census/NFHS spellings in several real, disclosed ways
+ * (abbreviated names in PMGSY; post-2014 Kannada-native renames in the
+ * boundary topojson) - see EXTERNAL_DISTRICT_NAME_ALIASES below.
  */
-export const DEMO_STATE = "Bihar";
+export const DEMO_STATE = "Karnataka";
 
 /** Census 2011 CSV uses upper-case state names. */
-export const CENSUS_STATE_NAME = "BIHAR";
+export const CENSUS_STATE_NAME = "KARNATAKA";
 
 /** NFHS-5 CSV uses title-case state names. */
-export const NFHS_STATE_NAME = "Bihar";
+export const NFHS_STATE_NAME = "Karnataka";
 
 /** PMGSY per-state data export file name (see datameet/pmgsy-geosadak). */
-export const PMGSY_STATE_FILE = "Bihar";
+export const PMGSY_STATE_FILE = "Karnataka";
 
 /**
  * Normalizes a district name for cross-dataset joining: upper-cases,
@@ -47,90 +55,113 @@ export function normalizeDistrictName(raw: string): string {
 }
 
 /**
- * Authoritative list of Bihar's 38 districts, spelled exactly as the
- * Census 2011 and NFHS-5 sources spell them (the two sources agree with
- * each other exactly on spelling). This is a static, hardcoded lookup
- * (not learned at runtime from whichever ingestion script happens to run
- * first) so that census.ts, nfhs.ts, and pmgsy.ts always write the same
- * `district` join-key value to their respective reference tables
- * regardless of which script runs, or in what order, or in separate
- * process invocations (`npm run ingest:census` vs `npm run ingest`).
+ * Authoritative list of Karnataka's 30 districts (2011-Census vintage,
+ * pre-dating the 2018 Vijayanagara split from Bellary), spelled exactly as
+ * the Census 2011 and NFHS-5 sources spell them (the two sources agree
+ * with each other exactly on spelling for all 30 - confirmed by the C1/C2
+ * cross-check against the NFHS-5 mirror's Karnataka rows). This is a
+ * static, hardcoded lookup (not learned at runtime from whichever
+ * ingestion script happens to run first) so that census.ts, nfhs.ts, and
+ * pmgsy.ts always write the same `district` join-key value to their
+ * respective reference tables regardless of which script runs, or in what
+ * order, or in separate process invocations (`npm run ingest:census` vs
+ * `npm run ingest`).
  */
-export const BIHAR_DISTRICTS = [
-  "Araria",
-  "Arwal",
-  "Aurangabad",
-  "Banka",
-  "Begusarai",
-  "Bhagalpur",
-  "Bhojpur",
-  "Buxar",
-  "Darbhanga",
-  "Gaya",
-  "Gopalganj",
-  "Jamui",
-  "Jehanabad",
-  "Kaimur (Bhabua)",
-  "Katihar",
-  "Khagaria",
-  "Kishanganj",
-  "Lakhisarai",
-  "Madhepura",
-  "Madhubani",
-  "Munger",
-  "Muzaffarpur",
-  "Nalanda",
-  "Nawada",
-  "Pashchim Champaran",
-  "Patna",
-  "Purba Champaran",
-  "Purnia",
-  "Rohtas",
-  "Saharsa",
-  "Samastipur",
-  "Saran",
-  "Sheikhpura",
-  "Sheohar",
-  "Sitamarhi",
-  "Siwan",
-  "Supaul",
-  "Vaishali"
+export const KARNATAKA_DISTRICTS = [
+  "Bagalkot",
+  "Bangalore",
+  "Bangalore Rural",
+  "Belgaum",
+  "Bellary",
+  "Bidar",
+  "Bijapur",
+  "Chamarajanagar",
+  "Chikkaballapura",
+  "Chikmagalur",
+  "Chitradurga",
+  "Dakshina Kannada",
+  "Davanagere",
+  "Dharwad",
+  "Gadag",
+  "Gulbarga",
+  "Hassan",
+  "Haveri",
+  "Kodagu",
+  "Kolar",
+  "Koppal",
+  "Mandya",
+  "Mysore",
+  "Raichur",
+  "Ramanagara",
+  "Shimoga",
+  "Tumkur",
+  "Udupi",
+  "Uttara Kannada",
+  "Yadgir"
 ];
 
 const CANONICAL_DISPLAY_NAMES = new Map<string, string>(
-  BIHAR_DISTRICTS.map((name) => [normalizeDistrictName(name), name])
+  KARNATAKA_DISTRICTS.map((name) => [normalizeDistrictName(name), name])
 );
 
 /**
- * Several of the real open-data sources used here (PMGSY's MasterData.xls
- * lookup, and the datameet/indian-district-boundaries topojson used for
- * the dashboard map) spell a handful of Bihar district names differently
- * from the Census 2011 / NFHS-5 sources (which agree with each other
- * exactly): two are literal English-vs-Hindi-transliteration translations
- * of direction ("East"/"West" vs "Purba"/"Pashchim"), one is an alternate
- * spelling ("Jahanabad" vs "Jehanabad"), one is a parenthetical/spacing
- * alternate name ("Chapra(Saran)" vs "Saran"), and one drops a vowel from
- * the parenthetical qualifier ("Kaimur Bhabhua" vs "Kaimur (Bhabua)").
+ * Two of the real open-data sources used here spell a number of Karnataka
+ * district names differently from the Census 2011 / NFHS-5 sources (which
+ * agree with each other exactly on all 30 names). Each entry below was
+ * observed directly against live data during the C1 verification spike on
+ * 2026-09-14, not guessed:
+ *
+ * PMGSY's MasterData.xls district-ID lookup uses abbreviated/alternate
+ * forms for 5 districts:
+ *   - "Bangalore R" / "Bangalore U" -> the Census names the same two
+ *     districts "Bangalore Rural" and "Bangalore" respectively.
+ *   - "Chickballapur" -> "Chikkaballapura" (spacing/spelling variant).
+ *   - "Chickmagalur" -> "Chikmagalur" (extra "c").
+ *   - "Ramnagar" -> "Ramanagara" (shortened form).
+ *
+ * The datameet/indian-district-boundaries topojson (despite being tagged
+ * "2011_c" vintage, matching the Census district count of 30) uses the
+ * post-2014 official Kannada-transliteration renames for 10 districts
+ * rather than the Census/NFHS English-era spellings:
+ *   - Bagalkote -> Bagalkot, Ballari -> Bellary, Belagavi -> Belgaum,
+ *     Bengaluru -> Bangalore, Bengaluru Rural -> Bangalore Rural,
+ *     Chamarajanagara -> Chamarajanagar, Chikkamagaluru -> Chikmagalur,
+ *     Kalaburagi -> Gulbarga, Mysuru -> Mysore, Shivamogga -> Shimoga,
+ *     Tumakuru -> Tumkur, Vijayapura -> Bijapur.
+ *
  * These are real, known alternate names/spellings for the same districts
- * (confirmed by cross-checking district counts, population, and geometry
- * against the Census/NFHS district list), not a data-quality issue this
- * build introduced - reconciled centrally here so every source (census.ts,
+ * (confirmed by cross-checking district counts and geometry against the
+ * Census/NFHS district list), not a data-quality issue this build
+ * introduced - reconciled centrally here so every source (census.ts,
  * nfhs.ts, pmgsy.ts, prepare-district-boundaries.ts) joins on the same key.
+ * No Bihar-era aliases (East/West Champaran, Jahanabad, Chapra, Kaimur)
+ * carry over - this table was rebuilt from scratch for Karnataka.
  */
 const EXTERNAL_DISTRICT_NAME_ALIASES: Record<string, string> = {
-  "EAST CHAMPARAN": "PURBA CHAMPARAN",
-  "WEST CHAMPARAN": "PASHCHIM CHAMPARAN",
-  JAHANABAD: "JEHANABAD",
-  "CHAPRA SARAN": "SARAN",
-  CHAPRA: "SARAN",
-  "KAIMUR BHABHUA": "KAIMUR"
+  "BANGALORE R": "BANGALORE RURAL",
+  "BANGALORE U": "BANGALORE",
+  CHICKBALLAPUR: "CHIKKABALLAPURA",
+  CHICKMAGALUR: "CHIKMAGALUR",
+  RAMNAGAR: "RAMANAGARA",
+  BAGALKOTE: "BAGALKOT",
+  BALLARI: "BELLARY",
+  BELAGAVI: "BELGAUM",
+  BENGALURU: "BANGALORE",
+  "BENGALURU RURAL": "BANGALORE RURAL",
+  CHAMARAJANAGARA: "CHAMARAJANAGAR",
+  CHIKKAMAGALURU: "CHIKMAGALUR",
+  KALABURAGI: "GULBARGA",
+  MYSURU: "MYSORE",
+  SHIVAMOGGA: "SHIMOGA",
+  TUMAKURU: "TUMKUR",
+  VIJAYAPURA: "BIJAPUR"
 };
 
 /**
  * Given any raw district-name spelling from any of the source datasets,
  * returns the canonical Census/NFHS-spelled display name to write into the
  * `district` column. Falls back to title-casing the normalized key for
- * any district not in the static Bihar list (should not happen for
+ * any district not in the static Karnataka list (should not happen for
  * in-scope data; guards against a silent join failure turning into a
  * visibly-wrong new district rather than a silently-dropped row).
  */

@@ -5,6 +5,7 @@
 body {
   margin: 0;
   font-family:
+    "IBM Plex Sans",
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
@@ -12,10 +13,74 @@ body {
     Helvetica,
     Arial,
     sans-serif;
-  background: #f5f6f8;
-  color: #1a1a1a;
+  background: #f6f5f2;
+  color: #1a1c1e;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
-  color: inherit;
+  color: #1e5aa8;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+::selection {
+  background: #d9e6f4;
+}
+
+@keyframes cipfade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cipslide {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes cippulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* Print styles for the Export modal's "PDF summary" flow (C8): hides the
+   app shell/chrome and lets the current screen's main content print
+   cleanly via window.print(), rather than faking a PDF. */
+@media print {
+  [data-no-print="true"] {
+    display: none !important;
+  }
+  [data-print-root="true"] {
+    position: static !important;
+    inset: auto !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  body {
+    background: #fff;
+  }
 }

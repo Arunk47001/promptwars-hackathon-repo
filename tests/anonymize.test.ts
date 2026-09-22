@@ -68,18 +68,18 @@ describe("scrubPii", () => {
 describe("generalizeLocation", () => {
   it("generalizes to district/block/village and drops nothing finer", () => {
     const result = generalizeLocation({
-      state: "Bihar",
-      district: "Patna",
-      block: "Barh",
-      village: "Barhara Kothi",
-      preciseLat: 25.5941,
-      preciseLng: 85.1376
+      state: "Karnataka",
+      district: "Mysore",
+      block: "Nanjangud",
+      village: "Hullahalli",
+      preciseLat: 12.2958,
+      preciseLng: 76.6394
     });
     expect(result).toEqual({
-      state: "Bihar",
-      district: "Patna",
-      block: "Barh",
-      village: "Barhara Kothi"
+      state: "Karnataka",
+      district: "Mysore",
+      block: "Nanjangud",
+      village: "Hullahalli"
     });
     // Precise coordinates must never appear on the generalized object.
     expect(Object.keys(result)).not.toContain("preciseLat");

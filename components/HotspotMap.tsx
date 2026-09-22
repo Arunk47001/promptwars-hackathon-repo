@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MapContainer, TileLayer, GeoJSON, Tooltip } from "react-leaflet";
 import type { Feature, FeatureCollection } from "geojson";
 import type { HotspotRow } from "@/app/dashboard/types";
+import { colorForScore, relativeSeverityLabel } from "@/lib/colorScale";
 import "leaflet/dist/leaflet.css";
 
 interface Props {
@@ -12,46 +13,23 @@ interface Props {
   onSelectDistrict: (district: string) => void;
 }
 
-/** Real Bihar district polygons (see scripts/ingest/prepare-district-boundaries.ts). */
-const GEOJSON_URL = "/data/bihar-districts.geojson";
-
-const BIHAR_CENTER: [number, number] = [25.9, 85.6];
+/** Real Karnataka district polygons (see scripts/ingest/prepare-district-boundaries.ts). */
+const GEOJSON_URL = "/data/karnataka-districts.geojson";
 
 /**
- * Colorblind-safe single-hue sequential scale (light -> dark blue), per
- * .squad/designer/brics-citizen-infrastructure-platform.md's "Divergence
- * flag": composite score is a single sequential severity measure, not a
- * diverging good/bad axis, so it should never be encoded as a
- * red-green-blue hue interpolation (misreads as diverging, and isn't
- * distinguishable for red-green color-vision deficiencies). This ramps
- * lightness only, within one hue.
+ * Approximate geographic center of Karnataka (~15.3N, 75.7E), spanning
+ * roughly 11.5N-18.5N and 74E-78.5E; the map's zoom level below is chosen
+ * to keep this whole extent in frame.
  */
-function colorForScore(score: number | undefined, max: number, min: number): string {
-  if (score === undefined) return "#e0e0e0";
-  // When every scored district ties (no variance - e.g. only 1-2 distinct
-  // district+category groups exist yet), there's no real "low" vs "high"
-  // end of the range, so don't collapse everything to t=0 (which renders
-  // as near-invisible on this light-to-dark scale) - use a visible mid
-  // tone instead, so tied hotspots still stand out on the map.
-  const range = max - min;
-  const t = range === 0 ? 0.5 : Math.max(0, Math.min(1, (score - min) / range));
-  // Light blue (#eff6ff) -> dark blue (#1e3a8a), interpolated per channel.
-  const light = { r: 0xef, g: 0xf6, b: 0xff };
-  const dark = { r: 0x1e, g: 0x3a, b: 0x8a };
-  const r = Math.round(light.r + (dark.r - light.r) * t);
-  const g = Math.round(light.g + (dark.g - light.g) * t);
-  const b = Math.round(light.b + (dark.b - light.b) * t);
-  return `rgb(${r},${g},${b})`;
-}
+const KARNATAKA_CENTER: [number, number] = [15.3, 75.7];
 
-function severityLabel(score: number | undefined, max: number, min: number): string {
-  if (score === undefined) return "no data";
-  const range = max - min;
-  const t = range === 0 ? 0.5 : Math.max(0, Math.min(1, (score - min) / range));
-  if (t >= 2 / 3) return "high severity";
-  if (t >= 1 / 3) return "medium severity";
-  return "low severity";
-}
+// colorForScore/severityLabel (colorblind-safe single-hue scale, with
+// "no variance" tie-handling) now live in lib/colorScale.ts so the new
+// district-grid mosaic (see components/dashboard/DistrictGrid.tsx) shares
+// the exact same logic instead of re-deriving its own ramp - see that
+// module's docblock for the full rationale (unchanged from this file's
+// original version, just relocated).
+const severityLabel = relativeSeverityLabel;
 
 export default function HotspotMap({ hotspots, selectedCategory, onSelectDistrict }: Props) {
   const [geoData, setGeoData] = useState<FeatureCollection | null>(null);
@@ -89,8 +67,8 @@ export default function HotspotMap({ hotspots, selectedCategory, onSelectDistric
 
   return (
     <MapContainer
-      center={BIHAR_CENTER}
-      zoom={7}
+      center={KARNATAKA_CENTER}
+      zoom={6}
       style={{ height: 480, width: "100%", borderRadius: 8 }}
       data-testid="hotspot-map"
     >

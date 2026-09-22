@@ -1,6 +1,6 @@
 /**
  * C4 ingestion script: PMGSY (Pradhan Mantri Gram Sadak Yojana) rural-road
- * connectivity data, filtered to the demo state (Bihar).
+ * connectivity data, filtered to the demo state (Karnataka).
  *
  * Source (see docs/dataset-provenance.md): datameet/pmgsy-geosadak on
  * GitHub, which republishes the official PMGSY open-data export from

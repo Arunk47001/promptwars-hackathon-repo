@@ -1,6 +1,6 @@
 /**
  * C4 ingestion script: Census of India 2011 district-level demographics,
- * filtered to the demo state (Bihar).
+ * filtered to the demo state (Karnataka).
  *
  * Source (see docs/dataset-provenance.md for full citation/caveats): a
  * third-party GitHub mirror of the well-known Kaggle "India Census 2011
