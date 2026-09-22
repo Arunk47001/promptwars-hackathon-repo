@@ -1,0 +1,2 @@
+Introducing the BRICS Citizen Infrastructure Platform: a citizen's SMS about a broken hand pump becomes a ranked, cited demand hotspot on a policymaker's dashboard — anonymized at intake and fused with real Indian census, health, and roads data.
+Built with Next.js, Postgres+PostGIS, and Gemini on a Twilio intake pipeline.

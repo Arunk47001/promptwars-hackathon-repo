@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>BRICS Citizen Infrastructure Platform — Brag</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/TextPlugin.min.js"></script>
+    <style>
+      :root {
+        --bg: #f6f5f2;
+        --surface: #ffffff;
+        --border: #e2e0da;
+        --border-strong: #ddd9d1;
+        --border-subtle: #f0ede7;
+        --ink: #1a1c1e;
+        --ink-soft: #2a2d31;
+        --muted: #45484c;
+        --faint: #4c4f53;
+        --fainter: #52555a;
+        --accent: #1e5aa8;
+        --accent-hover: #164374;
+        --accent-soft: #eaf1f9;
+        --danger: #a62b1f;
+        --danger-soft: #fbeae8;
+        --danger-soft-text: #8f231a;
+        --warn-soft: #fbf2e2;
+        --warn-soft-text: #8a5600;
+        --success-soft: #e9f2f0;
+        --success-soft-text: #0f5d56;
+        --sidebar-bg: #1c2024;
+        --sidebar-text: #b9bec4;
+        --sidebar-active: #2e343a;
+        --sidebar-heading: #868d97;
+        --sidebar-label: #dfe3e7;
+        --scrim: rgba(22, 24, 26, 0.14);
+        --r0: #f0f4f9;
+        --r1: #cddde9;
+        --r2: #9dbed6;
+        --r3: #6497bf;
+        --r4: #3a6f9e;
+        --r5: #1b4a78;
+        --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+        --font-mono: "IBM Plex Mono", monospace;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--bg);
+        font-family: var(--font-sans);
+        color: var(--ink);
+      }
+
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .full-bleed {
+        position: absolute;
+        inset: 0;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Scene 1 visible by default per transition hard rules */
+      #scene2,
+      #scene3,
+      #scene4,
+      #scene5,
+      #scene6 {
+        opacity: 0;
+      }
+
+      #shell {
+        opacity: 0;
+      }
+
+      /* ---------- Shared dashboard shell (sidebar) ---------- */
+      #sidebar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 220px;
+        height: 1080px;
+        background: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        display: flex;
+        flex-direction: column;
+        padding: 0 0 16px;
+        font-family: var(--font-sans);
+      }
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 22px 18px 24px;
+      }
+      .sidebar-mark {
+        width: 30px;
+        height: 30px;
+        border-radius: 4px;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+      }
+      .sidebar-brand-text .l1 {
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .sidebar-brand-text .l2 {
+        font-size: 10.5px;
+        color: var(--sidebar-heading);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-top: 2px;
+      }
+      .sidebar-section-label {
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--sidebar-heading);
+        padding: 10px 18px 8px;
+      }
+      .sidebar-nav {
+        padding: 0 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 9px 10px;
+        border-radius: 4px;
+        font-size: 13px;
+        color: var(--sidebar-text);
+        background: transparent;
+      }
+      .nav-item .dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0.55;
+        flex: none;
+      }
+      .nav-item.active {
+        background: var(--sidebar-active);
+        color: #ffffff;
+      }
+
+      /* ---------- Content area (right of sidebar) ---------- */
+      .content-area {
+        position: absolute;
+        top: 0;
+        left: 220px;
+        width: 1700px;
+        height: 1080px;
+        padding: 64px 70px 0;
+      }
+      .content-h1 {
+        font-size: 34px;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+        color: var(--ink);
+      }
+      .content-sub {
+        font-size: 15px;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+
+      /* ---------- Scene 1: hook ---------- */
+      #scene1 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .msg-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+      .msg-label {
+        font-size: 14px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--faint);
+        font-weight: 500;
+      }
+      .msg-bubble {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 34px 42px;
+        max-width: 980px;
+        box-shadow: 0 2px 8px rgba(20, 22, 24, 0.06);
+        font-size: 34px;
+        line-height: 1.45;
+        font-weight: 500;
+        color: var(--ink);
+        min-height: 1.45em;
+      }
+      .cursor-blink,
+      .cursor-solid,
+      .cursor-hide {
+        font-weight: 400;
+        color: var(--accent);
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+      .cursor-blink {
+        animation: blink 0.8s step-end infinite;
+      }
+      .cursor-solid {
+        animation: none;
+        opacity: 1;
+      }
+      .cursor-hide {
+        animation: none;
+        opacity: 0;
+      }
+
+      /* ---------- Scene 2: reveal ---------- */
+      .mini-chip {
+        position: absolute;
+        top: 14px;
+        left: 260px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 7px 14px;
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        box-shadow: 0 2px 8px rgba(20, 22, 24, 0.06);
+      }
+      .mini-chip .tag {
+        font-size: 9.5px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--success-soft-text);
+        background: var(--success-soft);
+        border-radius: 3px;
+        padding: 2px 6px;
+        font-weight: 600;
+      }
+      .header-slot {
+        position: relative;
+        height: 96px;
+      }
+      #titlecard {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 44px;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+        color: var(--ink);
+      }
+      #header-real {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+      }
+      .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 34px;
+        width: 1560px;
+      }
+      .kpi-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px 22px 22px;
+        opacity: 0;
+      }
+      .kpi-label {
+        font-size: 13px;
+        color: var(--muted);
+        letter-spacing: 0.01em;
+      }
+      .kpi-value {
+        font-family: var(--font-mono);
+        font-size: 44px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        margin-top: 10px;
+        font-variant-numeric: tabular-nums;
+      }
+      .kpi-sub {
+        font-size: 12.5px;
+        color: var(--fainter);
+        margin-top: 8px;
+      }
+
+      /* ---------- Scene 3: district grid ---------- */
+      .panel-row {
+        display: grid;
+        grid-template-columns: 1.05fr 1fr;
+        gap: 22px;
+        margin-top: 30px;
+        width: 1580px;
+      }
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 22px 24px 24px;
+      }
+      .panel h2 {
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .panel .panel-sub {
+        font-size: 12.5px;
+        color: var(--fainter);
+        margin-top: 5px;
+        margin-bottom: 16px;
+      }
+      .dgrid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 8px;
+      }
+      .dgrid-cell {
+        height: 62px;
+        border-radius: 5px;
+        opacity: 0;
+        transform-origin: center;
+      }
+      .hotspot-row {
+        display: grid;
+        grid-template-columns: 26px 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 13px 4px;
+        border-top: 1px solid var(--border-subtle);
+        opacity: 0;
+      }
+      .hotspot-row:first-child {
+        border-top: none;
+      }
+      .hotspot-rank {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        color: var(--fainter);
+      }
+      .hotspot-name {
+        font-size: 15px;
+        font-weight: 500;
+      }
+      .hotspot-meta {
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .hotspot-score-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .hotspot-score {
+        font-family: var(--font-mono);
+        font-size: 16px;
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+      }
+      .badge {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        border-radius: 3px;
+        padding: 3px 8px;
+        white-space: nowrap;
+      }
+      .badge-danger {
+        background: var(--danger-soft);
+        color: var(--danger-soft-text);
+      }
+      .badge-warn {
+        background: var(--warn-soft);
+        color: var(--warn-soft-text);
+      }
+
+      /* ---------- Scene 4: drawer ---------- */
+      #scrim4 {
+        position: absolute;
+        inset: 0;
+        background: var(--scrim);
+      }
+      #drawer4 {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 560px;
+        height: 1080px;
+        background: var(--surface);
+        border-left: 1px solid var(--border-strong);
+        box-shadow: -14px 0 40px rgba(20, 22, 24, 0.16);
+        padding: 54px 46px;
+      }
+      .drawer-district {
+        font-size: 26px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .drawer-cat {
+        font-size: 14px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .drawer-badge-row {
+        margin-top: 14px;
+      }
+      .rationale-block {
+        margin-top: 40px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 24px 26px;
+      }
+      .rationale-label {
+        font-size: 11.5px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fainter);
+        margin-bottom: 12px;
+      }
+      .rationale-text {
+        font-size: 17px;
+        line-height: 1.6;
+        color: var(--ink-soft);
+        min-height: 3.2em;
+      }
+
+      /* ---------- Scene 5: anonymization ---------- */
+      .anon-panel {
+        margin-top: 30px;
+        width: 1200px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 28px 30px 32px;
+      }
+      .anon-toggle {
+        position: relative;
+        display: inline-flex;
+        gap: 8px;
+        margin-bottom: 22px;
+      }
+      .toggle-btn {
+        font-family: var(--font-sans);
+        font-size: 13px;
+        font-weight: 500;
+        padding: 9px 18px;
+        border-radius: 5px;
+        border: 1px solid var(--border-strong);
+        background: var(--surface);
+        color: var(--muted);
+      }
+      .toggle-btn.on {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      .cursor-dot {
+        position: absolute;
+        top: -18px;
+        left: 118px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 2px solid var(--accent);
+        background: rgba(30, 90, 168, 0.15);
+        opacity: 0;
+      }
+      .record-stack {
+        position: relative;
+        height: 168px;
+      }
+      .record-card {
+        position: absolute;
+        inset: 0;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 20px 24px;
+        font-family: var(--font-mono);
+        font-size: 14.5px;
+        line-height: 1.9;
+      }
+      #record-after {
+        opacity: 0;
+      }
+      .rec-row .rec-key {
+        color: var(--fainter);
+        display: inline-block;
+        width: 130px;
+      }
+      .rec-row .rec-val {
+        color: var(--ink-soft);
+      }
+      .anon-method {
+        font-size: 12.5px;
+        color: var(--fainter);
+        margin-top: 18px;
+      }
+
+      /* ---------- Scene 6: outro ---------- */
+      #scene6 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 26px;
+      }
+      .outro-mark {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .outro-badge {
+        width: 52px;
+        height: 52px;
+        border-radius: 8px;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+      }
+      .outro-word .l1 {
+        font-size: 34px;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+        color: var(--ink);
+      }
+      .outro-word .l2 {
+        font-size: 13px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-top: 4px;
+      }
+      .outro-line {
+        font-size: 24px;
+        color: var(--ink-soft);
+        text-align: center;
+        max-width: 980px;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="brics"
+      data-start="0"
+      data-width="1920"
+      data-height="1080"
+      data-duration="22"
+    >
+      <div id="bg" class="full-bleed"></div>
+
+      <div id="shell" class="full-bleed">
+        <div id="sidebar">
+          <div class="sidebar-brand">
+            <div class="sidebar-mark">CI</div>
+            <div class="sidebar-brand-text">
+              <div class="l1">Citizen Infrastructure</div>
+              <div class="l2">BRICS Platform</div>
+            </div>
+          </div>
+          <div class="sidebar-section-label">Analysis</div>
+          <div class="sidebar-nav">
+            <div class="nav-item active" id="nav-overview">
+              <span class="dot"></span><span>Overview</span>
+            </div>
+            <div class="nav-item" id="nav-hotspots">
+              <span class="dot"></span><span>Hotspot explorer</span>
+            </div>
+            <div class="nav-item" id="nav-impact">
+              <span class="dot"></span><span>Impact tracking</span>
+            </div>
+            <div class="nav-item" id="nav-data">
+              <span class="dot"></span><span>Data &amp; provenance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 1 — Hook: the complaint -->
+      <section id="scene1" class="scene">
+        <div class="msg-wrap">
+          <div class="msg-label">Incoming SMS</div>
+          <div class="msg-bubble">
+            <span id="typed1"></span><span id="cursor1" class="cursor-blink">|</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 2 — Reveal: the dashboard shell -->
+      <section id="scene2" class="scene">
+        <div class="mini-chip">
+          <span class="tag">Received</span>
+          <span>Hand pump broken · Chikkaballapur</span>
+        </div>
+        <div class="content-area">
+          <div class="header-slot">
+            <div id="titlecard">BRICS Citizen Infrastructure Platform</div>
+            <div id="header-real">
+              <div class="content-h1">Dashboard overview</div>
+              <div class="content-sub">
+                India / Karnataka · citizen demand fused with demographic, infrastructure and
+                investment data
+              </div>
+            </div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi-card" id="kpi1">
+              <div class="kpi-label">Active hotspots</div>
+              <div class="kpi-value">128</div>
+              <div class="kpi-sub">across 30 districts</div>
+            </div>
+            <div class="kpi-card" id="kpi2">
+              <div class="kpi-label">Districts covered</div>
+              <div class="kpi-value">30</div>
+              <div class="kpi-sub">Census · NFHS-5 · PMGSY</div>
+            </div>
+            <div class="kpi-card" id="kpi3">
+              <div class="kpi-label">High severity</div>
+              <div class="kpi-value">22</div>
+              <div class="kpi-sub">composite score ≥ 7.5</div>
+            </div>
+            <div class="kpi-card" id="kpi4">
+              <div class="kpi-label">Actioned</div>
+              <div class="kpi-value">14</div>
+              <div class="kpi-sub">funded this quarter</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 3 — Highlight: the district grid lights up -->
+      <section id="scene3" class="scene">
+        <div class="content-area">
+          <div class="content-h1">Composite demand score by district</div>
+          <div class="content-sub">
+            Single-hue severity ramp · light = low demand, dark = high demand
+          </div>
+          <div class="panel-row">
+            <div class="panel">
+              <h2>District grid — Karnataka</h2>
+              <div class="panel-sub">One cell per district with a computed composite score.</div>
+              <div class="dgrid" id="dgrid"></div>
+            </div>
+            <div class="panel" data-layout-allow-occlusion="true">
+              <h2>Top hotspots</h2>
+              <div class="panel-sub">Ranked by composite demand score</div>
+              <div class="hotspot-row" id="hs1">
+                <span class="hotspot-rank">1</span>
+                <span>
+                  <span class="hotspot-name">Chikkaballapur</span>
+                  <span class="hotspot-meta">Water &amp; Sanitation · 42 requests</span>
+                </span>
+                <span class="hotspot-score-wrap">
+                  <span class="badge badge-danger">High severity</span>
+                  <span class="hotspot-score">8.70</span>
+                </span>
+              </div>
+              <div class="hotspot-row" id="hs2">
+                <span class="hotspot-rank">2</span>
+                <span>
+                  <span class="hotspot-name">Kalaburagi</span>
+                  <span class="hotspot-meta">Roads &amp; Connectivity · 31 requests</span>
+                </span>
+                <span class="hotspot-score-wrap">
+                  <span class="badge badge-danger">High severity</span>
+                  <span class="hotspot-score">8.10</span>
+                </span>
+              </div>
+              <div class="hotspot-row" id="hs3">
+                <span class="hotspot-rank">3</span>
+                <span>
+                  <span class="hotspot-name">Ballari</span>
+                  <span class="hotspot-meta">Healthcare Access · 26 requests</span>
+                </span>
+                <span class="hotspot-score-wrap">
+                  <span class="badge badge-warn">Medium severity</span>
+                  <span class="hotspot-score">7.40</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 4 — Highlight: the drawer explains itself -->
+      <section id="scene4" class="scene">
+        <div id="scrim4"></div>
+        <div id="drawer4">
+          <div class="drawer-district">Chikkaballapur</div>
+          <div class="drawer-cat">Water &amp; Sanitation</div>
+          <div class="drawer-badge-row"><span class="badge badge-danger">High severity</span></div>
+          <div class="rationale-block">
+            <div class="rationale-label">Policymaker rationale</div>
+            <div class="rationale-text">
+              <span id="typed4"></span><span id="cursor4" class="cursor-blink">|</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 5 — Highlight: anonymized, provably -->
+      <section id="scene5" class="scene">
+        <div class="content-area">
+          <div class="content-h1">Anonymization in effect</div>
+          <div class="content-sub">
+            Applied at intake, before any record reaches a policymaker-facing screen.
+          </div>
+          <div class="anon-panel">
+            <div class="anon-toggle">
+              <button class="toggle-btn on" id="btn-before" type="button">Show BEFORE</button>
+              <button class="toggle-btn" id="btn-after" type="button">Show AFTER</button>
+              <div class="cursor-dot" id="cursordot"></div>
+            </div>
+            <div class="record-stack">
+              <div class="record-card" id="record-before">
+                <div class="rec-row"><span class="rec-key">phone</span><span class="rec-val">+91 9XXXX XXXXX</span></div>
+                <div class="rec-row"><span class="rec-key">text</span><span class="rec-val">"Hand pump broken 2 weeks, no water, near old temple road, next to Ramesh's house"</span></div>
+                <div class="rec-row"><span class="rec-key">location</span><span class="rec-val">13.4356°N, 77.7315°E (exact)</span></div>
+              </div>
+              <div class="record-card" id="record-after">
+                <div class="rec-row"><span class="rec-key">id</span><span class="rec-val">sha256:8f2a…c91d</span></div>
+                <div class="rec-row"><span class="rec-key">text</span><span class="rec-val">"Water infrastructure complaint — hand pump non-functional"</span></div>
+                <div class="rec-row"><span class="rec-key">location</span><span class="rec-val">District: Chikkaballapur</span></div>
+              </div>
+            </div>
+            <div class="anon-method">
+              Method: salted SHA-256 identifier hashing · named-entity scrubbing on free text ·
+              location generalized to district.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 6 — Outro: the line -->
+      <section id="scene6" class="scene">
+        <div class="outro-mark">
+          <div class="outro-badge" id="outro-badge">CI</div>
+          <div class="outro-word">
+            <div class="l1">BRICS Citizen Infrastructure Platform</div>
+            <div class="l2">Karnataka demand-hotspot pipeline</div>
+          </div>
+        </div>
+        <div class="outro-line" id="outro-line">
+          A complaint becomes a citable policy decision. Anonymized the whole way.
+        </div>
+      </section>
+
+      <!-- ===================== Audio ===================== -->
+      <audio
+        id="bg-music"
+        data-start="0"
+        data-duration="22"
+        data-track-index="10"
+        data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.5,"v":0.25},{"t":16,"v":0.25},{"t":16.6,"v":0.3},{"t":20,"v":0.3},{"t":22,"v":0}]}]}'
+        src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"
+      ></audio>
+
+      <audio
+        id="sfx-drawer-slide"
+        data-start="11.5"
+        data-duration="0.6"
+        data-track-index="11"
+        data-volume="0.7"
+        src="assets/sfx/casino/card-slide-1.ogg"
+      ></audio>
+
+      <!-- beat-locked: 18.56s -->
+      <audio
+        id="sfx-toggle"
+        data-start="18.56"
+        data-duration="0.4"
+        data-track-index="12"
+        data-volume="0.75"
+        src="assets/sfx/interface/switch_007.ogg"
+      ></audio>
+
+      <audio
+        id="sfx-outro-bong"
+        data-start="20.15"
+        data-duration="0.13"
+        data-track-index="13"
+        data-volume="0.6"
+        src="assets/sfx/interface/bong_001.ogg"
+      ></audio>
+
+      <!-- Scene 1 typing texture: sparse keypress ticks, thinning near the end -->
+      <audio id="sfx-t1-1" data-start="0.55" data-duration="0.12" data-track-index="14" data-volume="0.4" src="assets/sfx/keyboard/keypress-003.wav"></audio>
+      <audio id="sfx-t1-2" data-start="0.85" data-duration="0.12" data-track-index="15" data-volume="0.4" src="assets/sfx/keyboard/keypress-011.wav"></audio>
+      <audio id="sfx-t1-3" data-start="1.15" data-duration="0.12" data-track-index="16" data-volume="0.4" src="assets/sfx/keyboard/keypress-019.wav"></audio>
+      <audio id="sfx-t1-4" data-start="1.5" data-duration="0.12" data-track-index="17" data-volume="0.38" src="assets/sfx/keyboard/keypress-007.wav"></audio>
+      <audio id="sfx-t1-5" data-start="1.9" data-duration="0.12" data-track-index="18" data-volume="0.35" src="assets/sfx/keyboard/keypress-023.wav"></audio>
+      <audio id="sfx-t1-6" data-start="2.35" data-duration="0.12" data-track-index="19" data-volume="0.3" src="assets/sfx/keyboard/keypress-015.wav"></audio>
+      <audio id="sfx-t1-7" data-start="2.85" data-duration="0.12" data-track-index="20" data-volume="0.25" src="assets/sfx/keyboard/keypress-028.wav"></audio>
+
+      <!-- Scene 4 rationale typing: thinner, quieter bed -->
+      <audio id="sfx-t4-1" data-start="12.55" data-duration="0.12" data-track-index="21" data-volume="0.28" src="assets/sfx/keyboard/keypress-005.wav"></audio>
+      <audio id="sfx-t4-2" data-start="12.95" data-duration="0.12" data-track-index="22" data-volume="0.26" src="assets/sfx/keyboard/keypress-017.wav"></audio>
+      <audio id="sfx-t4-3" data-start="13.4" data-duration="0.12" data-track-index="23" data-volume="0.24" src="assets/sfx/keyboard/keypress-030.wav"></audio>
+      <audio id="sfx-t4-4" data-start="13.9" data-duration="0.12" data-track-index="24" data-volume="0.22" src="assets/sfx/keyboard/keypress-009.wav"></audio>
+    </div>
+
+    <script>
+      gsap.registerPlugin(TextPlugin);
+
+      // ---- Build the district grid (deterministic, no Math.random) ----
+      var RAMP = ["var(--r0)", "var(--r1)", "var(--r2)", "var(--r3)", "var(--r4)", "var(--r5)"];
+      // 30 Karnataka districts, fixed severity index 0-5. Index 17 (Chikkaballapur, the
+      // hook's district) is the single darkest cell so the grid visually agrees with the
+      // "Top hotspots" list built from the same story.
+      var SEVERITIES = [
+        1, 2, 0, 3, 1, 4, 2, 1, 3, 2, 2, 1, 0, 2, 4, 1, 3, 5, 1, 0, 2, 3, 1, 4, 2, 1, 0, 3, 2, 4,
+      ];
+      var dgrid = document.getElementById("dgrid");
+      var cells = [];
+      for (var i = 0; i < SEVERITIES.length; i++) {
+        var cell = document.createElement("div");
+        cell.className = "dgrid-cell";
+        cell.style.background = RAMP[SEVERITIES[i]];
+        dgrid.appendChild(cell);
+        cells.push(cell);
+      }
+
+      var tl = gsap.timeline({ paused: true, defaults: { duration: 0.6, ease: "power3.out" } });
+
+      // ================= Scene 1 — Hook (0 - 3.5) =================
+      var HOOK_TEXT = "Hand pump broken 2 weeks. No drinking water. — Chikkaballapur.";
+      var t1cursor = document.getElementById("cursor1");
+      tl.call(function () { t1cursor.classList.replace("cursor-blink", "cursor-solid"); }, [], 0.15);
+      tl.to("#typed1", { text: { value: HOOK_TEXT }, duration: 2.6, ease: "none" }, 0.15);
+      tl.call(function () { t1cursor.classList.replace("cursor-solid", "cursor-blink"); }, [], 2.75);
+
+      // ================= Transition 1->2 at T2 = 3.5 =================
+      var T2 = 3.5;
+      tl.to("#scene1", { opacity: 0, duration: 0.45, ease: "sine.inOut" }, T2);
+      tl.fromTo("#scene2", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "sine.inOut" }, T2);
+      tl.fromTo("#shell", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "sine.inOut" }, T2);
+
+      // ---- Scene 2 internal choreography ----
+      tl.fromTo(".mini-chip", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.4 }, T2 + 0.15);
+      tl.fromTo("#titlecard", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4 }, T2 + 0.15);
+      // Titlecard holds, then crossfades into the real header before the KPI row lands.
+      tl.to("#titlecard", { opacity: 0, duration: 0.35, ease: "power2.out" }, T2 + 1.2);
+      tl.to("#header-real", { opacity: 1, duration: 0.35, ease: "power2.out" }, T2 + 1.2);
+
+      // beat-grid: kpi1 at 4.91s, kpi2 at 5.34s, kpi3 at 6.00s, kpi4 at 6.56s
+      tl.fromTo("#kpi1", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4 }, 4.91);
+      tl.fromTo("#kpi2", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4 }, 5.34);
+      tl.fromTo("#kpi3", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4 }, 6.0);
+      tl.fromTo("#kpi4", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4 }, 6.56);
+
+      // ================= Transition 2->3 at T3 = 7.0 =================
+      var T3 = 7.0;
+      tl.to("#scene2", { opacity: 0, duration: 0.4, ease: "power2.inOut" }, T3);
+      tl.fromTo(
+        "#scene3",
+        { opacity: 0, x: 24 },
+        { opacity: 1, x: 0, duration: 0.4, ease: "power2.inOut" },
+        T3,
+      );
+
+      // ---- Scene 3 internal choreography ----
+      tl.fromTo(
+        cells.slice(0, 10),
+        { opacity: 0, scale: 0.85 },
+        { opacity: 1, scale: 1, duration: 0.4, stagger: 0.03, ease: "power2.out" },
+        T3 + 0.35,
+      );
+      // beat-locked: 8.74s (main wave — the rest of the grid)
+      tl.fromTo(
+        cells.slice(10),
+        { opacity: 0, scale: 0.85 },
+        { opacity: 1, scale: 1, duration: 0.45, stagger: 0.02, ease: "power2.out" },
+        8.74,
+      );
+      // beat-locked: 9.29s (first Top Hotspot row)
+      tl.fromTo("#hs1", { opacity: 0, x: 14 }, { opacity: 1, x: 0, duration: 0.4 }, 9.29);
+      tl.fromTo("#hs2", { opacity: 0, x: 14 }, { opacity: 1, x: 0, duration: 0.4 }, 9.75);
+      tl.fromTo("#hs3", { opacity: 0, x: 14 }, { opacity: 1, x: 0, duration: 0.4 }, 10.2);
+
+      // ================= Transition 3->4 at T4 = 11.5 =================
+      // Scene 3 (district grid) is intentionally NOT faded out here: the drawer
+      // opens as a scrim + panel ON TOP of it, matching the real product's modal
+      // UX, and both fade out together at T5 once the drawer's job is done.
+      var T4 = 11.5;
+      tl.fromTo("#scene4", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "sine.inOut" }, T4);
+
+      // ---- Scene 4 internal choreography ----
+      tl.fromTo(
+        "#drawer4",
+        { x: 560, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.55, ease: "power3.out" },
+        T4 + 0.05,
+      );
+      var RATIONALE_TEXT =
+        "42 requests in 18 days · below-median road connectivity · composite score 8.7";
+      var t4cursor = document.getElementById("cursor4");
+      var rationaleStart = T4 + 1.05;
+      tl.call(function () { t4cursor.classList.replace("cursor-blink", "cursor-solid"); }, [], rationaleStart);
+      tl.to(
+        "#typed4",
+        { text: { value: RATIONALE_TEXT }, duration: 2.1, ease: "none" },
+        rationaleStart,
+      );
+      tl.call(
+        function () { t4cursor.classList.replace("cursor-solid", "cursor-blink"); },
+        [],
+        rationaleStart + 2.15,
+      );
+
+      // ================= Transition 4->5 at T5 = 16.0 =================
+      var T5 = 16.0;
+      tl.to("#scene3", { opacity: 0, duration: 0.45, ease: "sine.inOut" }, T5);
+      tl.to("#scene4", { opacity: 0, duration: 0.45, ease: "sine.inOut" }, T5);
+      tl.fromTo("#scene5", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "sine.inOut" }, T5);
+      // Sidebar nav highlight swaps to the real screen this scene shows.
+      tl.to("#nav-overview", { backgroundColor: "rgba(0,0,0,0)", color: "#b9bec4", duration: 0.2 }, T5);
+      tl.to("#nav-data", { backgroundColor: "#2e343a", color: "#ffffff", duration: 0.2 }, T5);
+
+      // ---- Scene 5 internal choreography ----
+      tl.fromTo(".anon-panel", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45 }, T5 + 0.1);
+
+      // beat-locked: 18.56s (Show AFTER toggle flip)
+      var FLIP = 18.56;
+      tl.to("#cursordot", { opacity: 1, duration: 0.15 }, FLIP - 0.55);
+      tl.to("#cursordot", { x: 132, duration: 0.35, ease: "power2.inOut" }, FLIP - 0.55);
+      tl.to("#cursordot", { scale: 0.7, duration: 0.12, ease: "power2.in" }, FLIP - 0.12);
+      tl.to("#cursordot", { scale: 1, opacity: 0, duration: 0.18, ease: "power2.out" }, FLIP + 0.02);
+      tl.to("#btn-before", { backgroundColor: "#ffffff", color: "#6d7076", duration: 0.15 }, FLIP);
+      tl.to("#btn-after", { backgroundColor: "#1e5aa8", color: "#ffffff", duration: 0.15 }, FLIP);
+      tl.to("#record-before", { opacity: 0, duration: 0.3, ease: "power2.inOut" }, FLIP);
+      tl.fromTo(
+        "#record-after",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.3, ease: "power2.inOut" },
+        FLIP,
+      );
+
+      // ================= Transition 5->6 at T6 = 20.0 =================
+      var T6 = 20.0;
+      tl.to("#scene5", { opacity: 0, duration: 0.45, ease: "sine.inOut" }, T6);
+      tl.to("#shell", { opacity: 0, duration: 0.45, ease: "sine.inOut" }, T6);
+      tl.fromTo("#scene6", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "sine.inOut" }, T6);
+
+      // ---- Scene 6 internal choreography (final scene — exit fades allowed) ----
+      tl.fromTo(
+        ".outro-mark",
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" },
+        T6 + 0.15,
+      );
+      tl.fromTo(
+        "#outro-line",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" },
+        T6 + 0.5,
+      );
+      // Gentle final fade to black as the render ends (last scene only).
+      tl.to("#scene6", { opacity: 0, duration: 0.4, ease: "sine.in" }, 21.6);
+
+      window.__timelines["brics"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
